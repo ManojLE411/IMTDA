@@ -1,34 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { BlogPost } from '../types';
+import { InternshipTrack } from '../../types';
 import { Save, X } from 'lucide-react';
 
-interface BlogPostFormProps {
-  initialData?: Partial<BlogPost>;
-  onSave: (post: BlogPost) => void;
+interface InternshipFormProps {
+  initialData?: Partial<InternshipTrack>;
+  onSave: (track: InternshipTrack) => void;
   onCancel: () => void;
 }
 
-const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave, onCancel }) => {
-  const [formData, setFormData] = useState<Partial<BlogPost>>({
+const InternshipForm: React.FC<InternshipFormProps> = ({ initialData, onSave, onCancel }) => {
+  const [formData, setFormData] = useState<Partial<InternshipTrack>>({
     title: '',
-    category: '',
-    author: '',
+    duration: '',
+    mode: 'Online',
+    skills: [],
+    description: '',
     image: '',
-    excerpt: '',
-    content: '',
     ...initialData
   });
+
+  const [skillsString, setSkillsString] = useState('');
 
   useEffect(() => {
     setFormData({
       title: '',
-      category: '',
-      author: '',
+      duration: '',
+      mode: 'Online',
+      skills: [],
+      description: '',
       image: '',
-      excerpt: '',
-      content: '',
       ...initialData
     });
+    if (initialData?.skills) {
+      setSkillsString(initialData.skills.join(', '));
+    }
   }, [initialData]);
 
   const handleChange = (
@@ -38,18 +43,25 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave, onCanc
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSkillsString(e.target.value);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.title && formData.content && formData.author && formData.category) {
-      // Assuming id and date are passed in initialData or handled by parent before this
-      onSave(formData as BlogPost);
+    if (formData.title && formData.description) {
+      const updatedTrack = {
+        ...formData,
+        skills: skillsString.split(',').map(s => s.trim()).filter(s => s.length > 0)
+      } as InternshipTrack;
+      onSave(updatedTrack);
     }
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 animate-slide-up">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">{formData.id ? 'Edit Post' : 'Create New Post'}</h2>
+        <h2 className="text-xl font-bold">{formData.id ? 'Edit Internship Track' : 'Create New Track'}</h2>
         <button
           type="button"
           onClick={onCancel}
@@ -61,7 +73,7 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave, onCanc
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Program Title</label>
             <input
               type="text"
               name="title"
@@ -69,39 +81,36 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave, onCanc
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               value={formData.title || ''}
               onChange={handleChange}
-              placeholder="Enter post title"
+              placeholder="e.g. AI & Machine Learning"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select
-              name="category"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-              value={formData.category || ''}
-              onChange={handleChange}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+            <input
+              type="text"
+              name="duration"
               required
-            >
-              <option value="">Select Category</option>
-              <option value="AI & Tech">AI & Tech</option>
-              <option value="Education">Education</option>
-              <option value="Company News">Company News</option>
-              <option value="Industry Trends">Industry Trends</option>
-            </select>
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              value={formData.duration || ''}
+              onChange={handleChange}
+              placeholder="e.g. 2 Months"
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
-            <input
-              type="text"
-              name="author"
-              required
+            <label className="block text-sm font-medium text-gray-700 mb-1">Mode</label>
+            <select
+              name="mode"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-              value={formData.author || ''}
+              value={formData.mode || 'Online'}
               onChange={handleChange}
-              placeholder="Author name"
-            />
+            >
+              <option value="Online">Online</option>
+              <option value="Offline">Offline</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
@@ -117,27 +126,26 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave, onCanc
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt (Short Summary)</label>
-          <textarea
-            name="excerpt"
-            rows={2}
+          <label className="block text-sm font-medium text-gray-700 mb-1">Key Skills (Comma separated)</label>
+          <input
+            type="text"
+            value={skillsString}
+            onChange={handleSkillsChange}
+            placeholder="React, Node.js, TypeScript"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-            value={formData.excerpt || ''}
-            onChange={handleChange}
-            placeholder="Brief summary of the post..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Content (Full Article)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea
-            name="content"
-            rows={10}
+            name="description"
+            rows={4}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm transition-all"
-            value={formData.content || ''}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            value={formData.description || ''}
             onChange={handleChange}
-            placeholder="Write your article content here..."
+            placeholder="Brief description of the program..."
           />
         </div>
 
@@ -153,7 +161,7 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave, onCanc
             type="submit"
             className="px-6 py-2 bg-imtda-primary text-white rounded-lg font-bold hover:bg-blue-800 flex items-center gap-2 transition-colors shadow-md"
           >
-            <Save size={18} /> Save Post
+            <Save size={18} /> Save Internship
           </button>
         </div>
       </form>
@@ -161,4 +169,4 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave, onCanc
   );
 };
 
-export default BlogPostForm;
+export default InternshipForm;

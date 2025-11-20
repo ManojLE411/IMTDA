@@ -1,18 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Internships from './pages/Internships';
-import Projects from './pages/Projects';
-import Training from './pages/Training';
-import Careers from './pages/Careers';
-import Contact from './pages/Contact';
-import Blog from './pages/Blog';
-import Admin from './pages/Admin';
-import AuthPage from './pages/Login'; // Unified Auth Page
-import StudentDashboard from './pages/StudentDashboard';
+import Navbar from './src/components/Navbar';
+import Footer from './src/components/Footer';
+import Home from './src/pages/Home';
+import About from './src/pages/About';
+import Internships from './src/pages/Internships';
+import Projects from './src/pages/Projects';
+import Training from './src/pages/Training';
+import Careers from './src/pages/Careers';
+import Blog from './src/pages/Blog';
+import Admin from './src/pages/Admin';
+import AuthPage from './src/pages/Login'; // Unified Auth Page
+import StudentDashboard from './src/pages/StudentDashboard';
 import { Page, BlogPost, InternshipTrack, TrainingProgram, InternshipApplication, Student } from './types';
 import { MessageCircle } from 'lucide-react';
 
@@ -192,9 +191,20 @@ const App: React.FC = () => {
     }
   }, [currentUser]);
 
-  const handleNavigate = (page: Page) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleNavigate = (page: Page, scrollToId?: string) => {
     setCurrentPage(page);
+    
+    if (scrollToId) {
+      // Wait for page to render, then scroll to the section
+      setTimeout(() => {
+        const element = document.getElementById(scrollToId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // CRUD Wrappers
@@ -289,7 +299,6 @@ const App: React.FC = () => {
           onNavigate={handleNavigate} 
         />
       );
-      case Page.CONTACT: return <Contact />;
       case Page.LOGIN: return <AuthPage initialMode="login" onLogin={handleLogin} onRegister={handleRegister} onNavigate={handleNavigate} />;
       case Page.REGISTER: return <AuthPage initialMode="register" onLogin={handleLogin} onRegister={handleRegister} onNavigate={handleNavigate} />;
       case Page.STUDENT_DASHBOARD: return (

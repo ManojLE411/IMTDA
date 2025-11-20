@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrainingProgram } from '../types';
+import { TrainingProgram } from '../../types';
 import { Users, BookOpen, Briefcase, Award } from 'lucide-react';
 
 interface TrainingProps {

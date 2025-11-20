@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { BlogPost, Page, InternshipTrack, TrainingProgram, InternshipApplication } from '../types';
+import { BlogPost, Page, InternshipTrack, TrainingProgram, InternshipApplication } from '../../types';
 import BlogPostForm from '../components/BlogPostForm';
 import InternshipForm from '../components/InternshipForm';
 import TrainingForm from '../components/TrainingForm';
 import { Plus, Edit, Trash2, LogOut, Lock, ArrowLeft, AlertCircle, Layout, Briefcase, BookOpen, Users, FileText, Mail, Phone, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 interface AdminProps {
   posts: BlogPost[];
@@ -119,8 +120,8 @@ const Admin: React.FC<AdminProps> = ({
         <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative animate-fade-in">
           
           <div className="text-center mb-6">
-            <div className="w-32 mx-auto mb-4">
-              <img src="https://i.ibb.co/Y7QzG0L/IMTDA-LOGO.png" alt="IMTDA Logo" className="w-full h-auto object-contain" />
+            <div className="w-32 mx-auto mb-4 bg-white p-3 rounded-lg">
+              <img src={logo} alt="IMTDA Logo" className="w-full h-auto object-contain" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Admin Login</h2>
             <p className="text-gray-500">Enter credentials to access dashboard</p>

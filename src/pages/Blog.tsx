@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BlogPost } from '../types';
+import { BlogPost } from '../../types';
 import { Calendar, User, ChevronRight, ChevronLeft, ArrowLeft } from 'lucide-react';
 
 interface BlogProps {

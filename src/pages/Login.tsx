@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Page, Student } from '../types';
+import { Page, Student } from '../../types';
 import { Lock, Mail, User, Phone, ArrowRight, LogIn, UserPlus } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 interface AuthPageProps {
   initialMode: 'login' | 'register';
@@ -88,7 +89,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ initialMode, onLogin, onRegister, o
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-8">
                <div className="bg-white p-2 rounded-lg">
-                 <img src="https://i.ibb.co/Y7QzG0L/IMTDA-LOGO.png" alt="IMTDA" className="w-8 h-8 object-contain" />
+                 <img src={logo} alt="IMTDA" className="w-10 h-10 object-contain" />
                </div>
                <span className="text-xl font-bold tracking-widest">IMTDA</span>
             </div>

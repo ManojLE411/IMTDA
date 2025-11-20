@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/src/assets/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IMTDA Infotech - Empowering Innovation</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,17 +39,25 @@
         },
       }
     </script>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+    <style>
+      @keyframes progress {
+        from { width: 0%; }
+        to { width: 100%; }
+      }
+      .animate-progress {
+        animation: progress 10s linear;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+    </style>
 </head>
   <body class="bg-gray-50 text-gray-800 antialiased">
     <div id="root"></div>

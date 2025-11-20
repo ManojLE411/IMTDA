@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Linkedin, Instagram, Twitter, Facebook, Lock } from 'lucide-react';
-import { Page } from '../types';
+import { Page } from '../../types';
 
 interface FooterProps {
     onNavigate: (page: Page) => void;
