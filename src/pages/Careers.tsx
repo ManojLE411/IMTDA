@@ -1,5 +1,5 @@
 import React from 'react';
-import { JobListing } from '../../types';
+import { JobListing } from '../utils/types';
 import { MapPin, Briefcase, Clock } from 'lucide-react';
 
 const jobs: JobListing[] = [

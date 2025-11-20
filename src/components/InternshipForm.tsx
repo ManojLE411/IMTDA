@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { InternshipTrack } from '../../types';
+import { InternshipTrack } from '../utils/types';
 import { Save, X } from 'lucide-react';
 
 interface InternshipFormProps {

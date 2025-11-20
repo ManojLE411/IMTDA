@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowRight, Cpu, Code, Database, Video, PenTool, BookOpen } from 'lucide-react';
-import { Page } from '../../types';
+import { Page } from '../utils/types';
 
 interface HomeProps {
   onNavigate: (page: Page, scrollToId?: string) => void;

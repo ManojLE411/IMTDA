@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { InternshipTrack, InternshipApplication, Student } from '../../types';
+import { InternshipTrack, InternshipApplication, Student } from '../utils/types';
 import { CheckCircle, Clock, MapPin, Upload } from 'lucide-react';
 
 interface InternshipsProps {

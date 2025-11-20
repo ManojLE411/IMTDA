@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Page, Student } from '../../types';
+import { Page, Student } from '../utils/types';
 import { Lock, Mail, User, Phone, ArrowRight, LogIn, UserPlus } from 'lucide-react';
 import logo from '../assets/logo.png';
 

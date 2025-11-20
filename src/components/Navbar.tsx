@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Menu, X, BrainCircuit, User, LogOut, LayoutDashboard } from 'lucide-react';
-import { Page, Student } from '../../types';
+import { Page, Student } from '../utils/types';
 import logo from '../assets/logo.png';
 
 interface NavbarProps {

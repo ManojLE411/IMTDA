@@ -12,7 +12,7 @@ import Blog from './src/pages/Blog';
 import Admin from './src/pages/Admin';
 import AuthPage from './src/pages/Login'; // Unified Auth Page
 import StudentDashboard from './src/pages/StudentDashboard';
-import { Page, BlogPost, InternshipTrack, TrainingProgram, InternshipApplication, Student } from './types';
+import { Page, BlogPost, InternshipTrack, TrainingProgram, InternshipApplication, Student } from './src/utils/types';
 import { MessageCircle } from 'lucide-react';
 
 // Default Data

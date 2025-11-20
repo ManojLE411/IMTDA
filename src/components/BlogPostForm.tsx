@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BlogPost } from '../../types';
+import { BlogPost } from '../utils/types';
 import { Save, X } from 'lucide-react';
 
 interface BlogPostFormProps {

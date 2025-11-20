@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Page, Student, InternshipApplication, InternshipTrack, TrainingProgram } from '../../types';
+import { Page, Student, InternshipApplication, InternshipTrack, TrainingProgram } from '../utils/types';
 import { User, BookOpen, Clock, FileText, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
 interface StudentDashboardProps {

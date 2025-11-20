@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrainingProgram } from '../../types';
+import { TrainingProgram } from '../utils/types';
 import { Save, X } from 'lucide-react';
 
 interface TrainingFormProps {

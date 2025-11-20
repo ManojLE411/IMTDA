@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { BlogPost, Page, InternshipTrack, TrainingProgram, InternshipApplication } from '../../types';
+import { BlogPost, Page, InternshipTrack, TrainingProgram, InternshipApplication } from '../utils/types';
 import BlogPostForm from '../components/BlogPostForm';
 import InternshipForm from '../components/InternshipForm';
 import TrainingForm from '../components/TrainingForm';
