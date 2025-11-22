@@ -4,6 +4,7 @@ import Navbar from './src/components/Navbar';
 import Footer from './src/components/Footer';
 import Home from './src/pages/Home';
 import About from './src/pages/About';
+import Services from './src/pages/Services';
 import Internships from './src/pages/Internships';
 import Projects from './src/pages/Projects';
 import Training from './src/pages/Training';
@@ -285,6 +286,7 @@ const App: React.FC = () => {
     switch (currentPage) {
       case Page.HOME: return <Home onNavigate={handleNavigate} />;
       case Page.ABOUT: return <About />;
+      case Page.SERVICES: return <Services onNavigate={handleNavigate} />;
       case Page.INTERNSHIPS: return <Internships tracks={internshipTracks} onApply={handleNewApplication} currentUser={currentUser} />;
       case Page.PROJECTS: return <Projects />;
       case Page.TRAINING: return <Training programs={trainingPrograms} />;

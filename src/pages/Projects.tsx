@@ -13,10 +13,10 @@ const projectsData: Project[] = [
   },
   {
     id: '2',
-    title: 'E-Learning Platform',
+    title: 'Enterprise E-Learning Platform',
     category: 'Web',
-    description: 'A comprehensive LMS with video streaming, quizzes, and progress tracking for students.',
-    techStack: ['React', 'Node.js', 'AWS S3'],
+    description: 'A scalable SaaS platform with video streaming, real-time analytics, and automated assessments for educational institutions.',
+    techStack: ['React', 'Node.js', 'AWS S3', 'PostgreSQL', 'Redis'],
     image: 'https://picsum.photos/500/300?random=11'
   },
   {
@@ -42,13 +42,37 @@ const projectsData: Project[] = [
     description: 'IoT based intrusion detection system with automated alerts.',
     techStack: ['Raspberry Pi', 'Python', 'Sensors'],
     image: 'https://picsum.photos/500/300?random=14'
+  },
+  {
+    id: '6',
+    title: 'Cloud-Based Analytics Dashboard',
+    category: 'Data Science',
+    description: 'Real-time business intelligence platform with interactive dashboards and automated reporting for enterprise clients.',
+    techStack: ['Python', 'React', 'PostgreSQL', 'AWS', 'Docker'],
+    image: 'https://picsum.photos/500/300?random=15'
+  },
+  {
+    id: '7',
+    title: 'Microservices E-Commerce Platform',
+    category: 'Web',
+    description: 'High-performance e-commerce solution built with microservices architecture, supporting millions of transactions.',
+    techStack: ['Node.js', 'React', 'MongoDB', 'Kubernetes', 'Redis'],
+    image: 'https://picsum.photos/500/300?random=16'
+  },
+  {
+    id: '8',
+    title: 'Automated Workflow Management System',
+    category: 'Web',
+    description: 'Enterprise workflow automation platform that streamlines business processes and reduces operational overhead.',
+    techStack: ['Django', 'React', 'Celery', 'PostgreSQL', 'RabbitMQ'],
+    image: 'https://picsum.photos/500/300?random=17'
   }
 ];
 
 const Projects: React.FC = () => {
   const [filter, setFilter] = useState<string>('All');
   
-  const categories = ['All', 'AI/ML', 'Web', 'VLSI', 'IoT'];
+  const categories = ['All', 'AI/ML', 'Web', 'Data Science', 'IoT', 'VLSI'];
 
   const filteredProjects = filter === 'All' 
     ? projectsData 
@@ -58,8 +82,8 @@ const Projects: React.FC = () => {
     <div className="bg-white min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Projects & R&D</h1>
-          <p className="text-gray-600">Showcasing innovation across Artificial Intelligence, Web Technologies, and Hardware Design.</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Software Solutions & Projects</h1>
+          <p className="text-gray-600">Delivering innovative software solutions across AI/ML, Web Development, Cloud Infrastructure, and Enterprise Applications.</p>
         </div>
 
         {/* Filter Tabs */}

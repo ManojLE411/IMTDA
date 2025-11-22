@@ -2,8 +2,9 @@
 export enum Page {
   HOME = 'home',
   ABOUT = 'about',
-  INTERNSHIPS = 'internships',
+  SERVICES = 'services',
   PROJECTS = 'projects',
+  INTERNSHIPS = 'internships',
   TRAINING = 'training',
   CAREERS = 'careers',
   CONTACT = 'contact',

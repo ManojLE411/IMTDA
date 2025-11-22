@@ -15,7 +15,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <div className="space-y-4">
             <h3 className="text-2xl font-bold text-imtda-accent">IMTDA Infotech</h3>
             <p className="text-gray-400 text-sm">
-              Empowering the next generation of innovators through AI-driven education and industrial R&D solutions.
+              Delivering enterprise-grade software solutions, AI-powered systems, and professional training services to drive digital transformation.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors"><Linkedin size={20} /></a>
@@ -30,7 +30,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <h4 className="text-lg font-semibold mb-4 text-gray-200">Quick Links</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li><button onClick={() => onNavigate(Page.ABOUT)} className="hover:text-imtda-accent transition-colors">About Us</button></li>
-              <li><button onClick={() => onNavigate(Page.INTERNSHIPS)} className="hover:text-imtda-accent transition-colors">Internships</button></li>
+              <li><button onClick={() => onNavigate(Page.SERVICES)} className="hover:text-imtda-accent transition-colors">Services</button></li>
               <li><button onClick={() => onNavigate(Page.PROJECTS)} className="hover:text-imtda-accent transition-colors">Projects</button></li>
               <li><button onClick={() => onNavigate(Page.BLOG)} className="hover:text-imtda-accent transition-colors">Blog</button></li>
               <li><button onClick={() => onNavigate(Page.CAREERS)} className="hover:text-imtda-accent transition-colors">Careers</button></li>
@@ -39,13 +39,13 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Services */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-gray-200">Domains</h4>
+            <h4 className="text-lg font-semibold mb-4 text-gray-200">Services</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>Artificial Intelligence & ML</li>
-              <li>Full Stack Development</li>
-              <li>VLSI Design</li>
-              <li>AutoCAD & CATIA</li>
-              <li>Data Science</li>
+              <li><button onClick={() => onNavigate(Page.SERVICES)} className="hover:text-imtda-accent transition-colors">Custom Software Development</button></li>
+              <li><button onClick={() => onNavigate(Page.SERVICES)} className="hover:text-imtda-accent transition-colors">AI & Machine Learning</button></li>
+              <li><button onClick={() => onNavigate(Page.SERVICES)} className="hover:text-imtda-accent transition-colors">Cloud & DevOps</button></li>
+              <li><button onClick={() => onNavigate(Page.SERVICES)} className="hover:text-imtda-accent transition-colors">Data Engineering</button></li>
+              <li><button onClick={() => onNavigate(Page.TRAINING)} className="hover:text-imtda-accent transition-colors">Training Programs</button></li>
             </ul>
           </div>
 

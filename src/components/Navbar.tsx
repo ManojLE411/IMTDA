@@ -17,10 +17,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, currentUser, o
   const navItems = [
     { label: 'Home', value: Page.HOME },
     { label: 'About', value: Page.ABOUT },
-    { label: 'Internships', value: Page.INTERNSHIPS },
+    { label: 'Services', value: Page.SERVICES },
     { label: 'Projects', value: Page.PROJECTS },
-    { label: 'Training', value: Page.TRAINING },
     { label: 'Careers', value: Page.CAREERS },
+    { label: 'Training', value: Page.TRAINING },
     { label: 'Blog', value: Page.BLOG },
   ];
 

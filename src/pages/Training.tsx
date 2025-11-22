@@ -11,8 +11,8 @@ const Training: React.FC<TrainingProps> = ({ programs }) => {
     <div className="bg-white min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900">Training & Consultancy</h1>
-          <p className="mt-4 text-xl text-gray-600">Upskilling students and empowering enterprises with custom AI solutions.</p>
+          <h1 className="text-4xl font-bold text-gray-900">Professional Training Programs</h1>
+          <p className="mt-4 text-xl text-gray-600">Upskilling programs and technical training to build expertise in cutting-edge technologies.</p>
         </div>
 
         {/* Service Cards */}
@@ -47,10 +47,10 @@ const Training: React.FC<TrainingProps> = ({ programs }) => {
            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
            <div className="relative z-10">
              <Award className="mx-auto w-16 h-16 text-imtda-accent mb-4" />
-             <h2 className="text-3xl font-bold mb-4">Ready to Transform?</h2>
-             <p className="max-w-2xl mx-auto mb-8 text-blue-100">Whether you are a student looking to jumpstart your career or an institution aiming for excellence, IMTDA is your partner in progress.</p>
+             <h2 className="text-3xl font-bold mb-4">Ready to Upskill Your Team?</h2>
+             <p className="max-w-2xl mx-auto mb-8 text-blue-100">Enhance your team's capabilities with our professional training programs in AI, software development, cloud technologies, and more.</p>
              <button className="bg-white text-imtda-primary px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg">
-               Contact Us Today
+               Enquire About Training
              </button>
            </div>
         </div>
