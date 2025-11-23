@@ -1,0 +1,555 @@
+/* HomePage Styles */
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: rgb(2, 6, 23);
+  color: rgb(241, 245, 249);
+}
+
+/* Hero Section */
+.heroSection {
+  position: relative;
+  height: 85vh;
+  min-height: 640px;
+  overflow: hidden;
+  background-color: #1E3A8A;
+}
+
+@media (min-width: 640px) {
+  .heroSection {
+    height: 90vh;
+  }
+}
+
+.slideContainer {
+  position: absolute;
+  inset: 0;
+}
+
+.slideBackground {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.slideOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(30, 58, 138, 0.7);
+  mix-blend-mode: multiply;
+}
+
+.slideGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, rgba(30, 58, 138, 0.9));
+}
+
+.heroContent {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.badgeContainer {
+  margin-bottom: 1.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.heroTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2rem;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .heroTitle {
+    font-size: 3.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .heroTitle {
+    font-size: 4.5rem;
+  }
+}
+
+.heroSubtitle {
+  font-size: 1.125rem;
+  color: rgb(226, 232, 240);
+  max-width: 48rem;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+  line-height: 1.75;
+}
+
+@media (min-width: 768px) {
+  .heroSubtitle {
+    font-size: 1.25rem;
+  }
+}
+
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.primaryButton {
+  position: relative;
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, rgb(37, 99, 235), rgb(79, 70, 229));
+  border-radius: 9999px;
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.primaryButton:hover {
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
+}
+
+.primaryButtonContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.primaryButton:hover .primaryButtonContent svg {
+  transform: translateX(0.25rem);
+}
+
+.primaryButtonOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgb(79, 70, 229), rgb(37, 99, 235));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.primaryButton:hover .primaryButtonOverlay {
+  opacity: 1;
+}
+
+.secondaryButton {
+  padding: 1rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 9999px;
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  transition: background-color 0.3s;
+}
+
+.secondaryButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Slide Indicators */
+.slideIndicators {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.75rem;
+  z-index: 20;
+}
+
+.indicator {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  transition: all 0.3s;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.indicator:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.indicatorActive {
+  background-color: white;
+  width: 2rem;
+}
+
+/* Competencies Section */
+.competenciesSection {
+  padding: 5rem 0;
+  background-color: rgb(15, 23, 42);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 1s;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.competenciesSectionHidden {
+  opacity: 0;
+  transform: translateY(2.5rem);
+}
+
+.competenciesContainer {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .competenciesContainer {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .competenciesContainer {
+    padding: 0 2rem;
+  }
+}
+
+.competenciesHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.competenciesTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .competenciesTitle {
+    font-size: 2.25rem;
+  }
+}
+
+.competenciesDescription {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  color: rgb(203, 213, 225);
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.competenciesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .competenciesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .competenciesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.competencyCard {
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.5s;
+  cursor: pointer;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.competencyCardHidden {
+  opacity: 0;
+  transform: translateY(2.5rem);
+}
+
+.competencyCard:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.competencyIconContainer {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: rgba(30, 58, 138, 0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: background-color 0.2s;
+}
+
+.competencyCard:hover .competencyIconContainer {
+  background-color: #1E3A8A;
+}
+
+.competencyIcon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #1E3A8A;
+  transition: color 0.2s;
+}
+
+.competencyCard:hover .competencyIcon {
+  color: white;
+}
+
+.competencyTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.75rem;
+}
+
+.competencyDescription {
+  color: rgb(203, 213, 225);
+}
+
+/* Stats Section */
+.statsSection {
+  padding: 4rem 0;
+  background-color: #1E3A8A;
+  color: white;
+  transition: all 1s;
+  transform: scale(1);
+  opacity: 1;
+}
+
+.statsSectionHidden {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.statsContainer {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .statsContainer {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .statsContainer {
+    padding: 0 2rem;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statItem {
+  transition: all 0.7s;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.statItemHidden {
+  opacity: 0;
+  transform: translateY(2.5rem);
+}
+
+.statValue {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #60A5FA;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .statValue {
+    font-size: 3rem;
+  }
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: rgb(191, 219, 254);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (min-width: 768px) {
+  .statLabel {
+    font-size: 1rem;
+  }
+}
+
+/* Testimonials Section */
+.testimonialsSection {
+  padding: 5rem 0;
+  background-color: rgb(15, 23, 42);
+  overflow: hidden;
+}
+
+.testimonialsHeader {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  transition: all 1s;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (min-width: 640px) {
+  .testimonialsHeader {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonialsHeader {
+    padding: 0 2rem;
+  }
+}
+
+.testimonialsHeaderHidden {
+  opacity: 0;
+  transform: translateY(-2.5rem);
+}
+
+.testimonialsTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+}
+
+.testimonialsSubtitle {
+  margin-top: 0.5rem;
+  color: rgb(203, 213, 225);
+}
+
+.testimonialsContainer {
+  position: relative;
+}
+
+.testimonialsScroll {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 2rem;
+  padding-left: 1rem;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.testimonialsScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.testimonialCard {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: rgb(241, 245, 249);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  min-width: 350px;
+  scroll-snap-align: center;
+  transition: all 0.7s;
+  transform: translateX(0);
+  opacity: 1;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (min-width: 768px) {
+  .testimonialCard {
+    min-width: 400px;
+  }
+}
+
+.testimonialCardHidden {
+  opacity: 0;
+  transform: translateX(-2.5rem);
+}
+
+.testimonialHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.testimonialAvatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  margin-right: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.testimonialInfo {
+  text-align: left;
+}
+
+.testimonialName {
+  font-weight: 700;
+  color: white;
+}
+
+.testimonialTitle {
+  font-size: 0.75rem;
+  color: rgb(148, 163, 184);
+}
+
+.testimonialQuote {
+  color: rgb(226, 232, 240);
+  font-style: italic;
+}
+

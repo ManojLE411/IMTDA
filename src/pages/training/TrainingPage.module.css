@@ -1,0 +1,269 @@
+/* TrainingPage Styles */
+.pageContainer {
+  background-color: rgb(2, 6, 23);
+  color: rgb(241, 245, 249);
+  min-height: 100vh;
+  padding: 5rem 0;
+}
+
+.content {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content {
+    padding: 0 2rem;
+  }
+}
+
+/* Loading State */
+.loading {
+  background-color: rgb(2, 6, 23);
+  min-height: 100vh;
+  padding: 3rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingText {
+  text-align: center;
+  color: rgb(203, 213, 225);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 3rem;
+  }
+}
+
+.subtitle {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  color: rgb(203, 213, 225);
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Programs Grid */
+.programsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .programsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.programCard {
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.programCardInstitutional {
+  background-color: rgba(30, 58, 138, 0.1);
+  border-color: rgba(30, 58, 138, 0.3);
+}
+
+.programCardCorporate {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.programCard:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-0.25rem);
+}
+
+.programIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.programIconInstitutional {
+  background-color: rgb(37, 99, 235);
+}
+
+.programIconCorporate {
+  background-color: rgb(31, 41, 55);
+}
+
+.programTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.programDescription {
+  color: rgb(203, 213, 225);
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+.programFeatures {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: rgb(203, 213, 225);
+  margin-bottom: 1rem;
+}
+
+.programFeature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.programFeatureDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+}
+
+.programFeatureDotInstitutional {
+  background-color: #60A5FA;
+}
+
+.programFeatureDotCorporate {
+  background-color: rgb(107, 114, 128);
+}
+
+.programButton {
+  margin-top: 2rem;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.programButtonInstitutional {
+  border-color: #1E3A8A;
+  color: #60A5FA;
+  background-color: transparent;
+}
+
+.programButtonInstitutional:hover {
+  background-color: #1E3A8A;
+  color: white;
+  border-color: #1E3A8A;
+}
+
+.programButtonCorporate {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgb(203, 213, 225);
+  background-color: transparent;
+}
+
+.programButtonCorporate:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  color: rgb(148, 163, 184);
+  padding: 2.5rem 0;
+}
+
+/* CTA Section */
+.ctaSection {
+  margin-top: 4rem;
+  background-color: #1E3A8A;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaPattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+  opacity: 0.1;
+}
+
+.ctaContent {
+  position: relative;
+  z-index: 10;
+}
+
+.ctaIcon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  color: #60A5FA;
+}
+
+.ctaTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.ctaDescription {
+  max-width: 42rem;
+  margin: 0 auto 2rem;
+  color: rgb(191, 219, 254);
+}
+
+.ctaButton {
+  background-color: white;
+  color: #1E3A8A;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.2s;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.ctaButton:hover {
+  background-color: rgb(241, 245, 249);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+

@@ -1,0 +1,43 @@
+/* SectionHeader Component Styles */
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.alignLeft {
+  text-align: left;
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+}
+

@@ -18,6 +18,14 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, './src')
         }
+      },
+      optimizeDeps: {
+        include: ['react-router-dom', 'react-router'],
+        exclude: [],
+        force: true
+      },
+      ssr: {
+        noExternal: ['react-router-dom']
       }
     };
 });

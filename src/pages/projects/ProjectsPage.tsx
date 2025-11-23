@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import { ExternalLink, Github, FolderOpen } from 'lucide-react';
-
-interface Project {
-  id: string;
-  title: string;
-  category: 'AI/ML' | 'Web' | 'VLSI' | 'IoT' | 'Data Science';
-  description: string;
-  techStack: string[];
-  image: string;
-}
+import { Project } from '@/types/common.types';
+import { Tabs, EmptyState, SectionHeader, Badge } from '@/components/ui';
+import styles from './ProjectsPage.module.css';
 
 const projectsData: Project[] = [
   {
@@ -87,63 +81,56 @@ export const ProjectsPage: React.FC = () => {
     : projectsData.filter(p => p.category === filter);
 
   return (
-    <div className="bg-white min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Software Solutions & Projects</h1>
-          <p className="text-gray-600">Delivering innovative software solutions across AI/ML, Web Development, Cloud Infrastructure, and Enterprise Applications.</p>
-        </div>
+    <div className={styles.pageContainer}>
+      <div className={styles.content}>
+        <SectionHeader
+          title="Our Software Solutions & Projects"
+          subtitle="Delivering innovative software solutions across AI/ML, Web Development, Cloud Infrastructure, and Enterprise Applications."
+          className={styles.header}
+        />
 
         {/* Filter Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                filter === cat 
-                  ? 'bg-imtda-primary text-white shadow-lg transform scale-105' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          tabs={categories.map(cat => ({ id: cat, label: cat }))}
+          activeTab={filter}
+          onTabChange={setFilter}
+          variant="pills"
+          className={styles.filterTabs}
+        />
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className={styles.projectsGrid}>
           {filteredProjects.map(project => (
-            <div key={project.id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300">
-              <div className="relative overflow-hidden h-48">
+            <div key={project.id} className={styles.projectCard}>
+              <div className={styles.projectImageContainer}>
                 <img 
                   src={project.image} 
                   alt={project.title} 
-                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" 
+                  className={styles.projectImage}
                 />
-                <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+                <Badge variant="primary" className={styles.projectCategory}>
                   {project.category}
-                </div>
+                </Badge>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-imtda-primary transition-colors">{project.title}</h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{project.description}</p>
+              <div className={styles.projectContent}>
+                <h3 className={styles.projectTitle}>{project.title}</h3>
+                <p className={styles.projectDescription}>{project.description}</p>
                 
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className={styles.projectTechStack}>
                   {project.techStack.map(tech => (
-                    <span key={tech} className="text-xs font-mono bg-gray-50 text-gray-500 px-2 py-1 rounded border">
+                    <Badge key={tech} variant="default" size="sm" className={styles.techTag}>
                       {tech}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                   <button className="flex items-center text-sm text-imtda-primary font-semibold hover:underline">
-                     View Details <FolderOpen size={16} className="ml-1" />
+                <div className={styles.projectFooter}>
+                   <button className={styles.viewDetailsButton}>
+                     View Details <FolderOpen className={styles.viewDetailsIcon} />
                    </button>
-                   <div className="flex gap-3">
-                     <a href="#" className="text-gray-400 hover:text-gray-900"><Github size={18} /></a>
-                     <a href="#" className="text-gray-400 hover:text-gray-900"><ExternalLink size={18} /></a>
+                   <div className={styles.projectLinks}>
+                     <a href="#" className={styles.projectLink}><Github size={18} /></a>
+                     <a href="#" className={styles.projectLink}><ExternalLink size={18} /></a>
                    </div>
                 </div>
               </div>
@@ -152,9 +139,11 @@ export const ProjectsPage: React.FC = () => {
         </div>
 
         {filteredProjects.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            <p>No projects found in this category yet.</p>
-          </div>
+          <EmptyState
+            type="empty"
+            message="No projects found in this category yet."
+            className={styles.emptyState}
+          />
         )}
       </div>
     </div>
