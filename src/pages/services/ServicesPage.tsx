@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Rocket, Send } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Rocket, Send, ArrowLeft } from 'lucide-react';
 import { Page } from '@/constants';
 import { useServices } from '@/hooks/useServices';
+import { Service } from '@/types/service.types';
 import { getIcon } from '@/utils/iconMap';
 import styles from './ServicesPage.module.css';
 
@@ -9,8 +11,21 @@ export interface ServicesPageProps {
   onNavigate?: (page: Page, scrollToId?: string) => void;
 }
 
-export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
+export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate: onNavigateProp }) => {
+  const navigate = useNavigate();
+  
+  // Helper function to handle navigation
+  const handleNavigate = (page: Page) => {
+    // Use React Router navigate if available, otherwise fall back to prop
+    const route = `/${page}`;
+    if (navigate) {
+      navigate(route);
+    } else if (onNavigateProp) {
+      onNavigateProp(page);
+    }
+  };
   const [hoveredService, setHoveredService] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const { services } = useServices();
 
   // Fallback services if none exist in storage
@@ -84,6 +99,67 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
     }
   ];
 
+  // Scroll to top when viewing service
+  const handleViewService = (service: Service) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelectedService(service);
+  };
+
+  const handleBackToList = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelectedService(null);
+  };
+
+  // If a service is selected, show detail view
+  if (selectedService) {
+    const Icon = getIcon(selectedService.icon || 'Code');
+    return (
+      <div className={styles.serviceDetail}>
+        <div className={styles.serviceDetailContent}>
+          <button 
+            onClick={handleBackToList}
+            className={styles.backButton}
+          >
+            <ArrowLeft size={20} className={styles.backIcon} /> Back to Services
+          </button>
+
+          <div className={styles.serviceHeader}>
+            <div className={styles.serviceIconContainer}>
+              <Icon className={styles.serviceDetailIcon} />
+            </div>
+            <h1 className={styles.serviceDetailTitle}>
+              {selectedService.title}
+            </h1>
+            <p className={styles.serviceDetailDescription}>
+              {selectedService.description}
+            </p>
+          </div>
+
+          {selectedService.image && (
+            <div className={styles.serviceImage}>
+              <img 
+                src={selectedService.image} 
+                alt={selectedService.title} 
+              />
+            </div>
+          )}
+
+          <div className={styles.serviceContent}>
+            <h2 className={styles.serviceFeaturesTitle}>Key Features</h2>
+            <ul className={styles.serviceFeaturesList}>
+              {selectedService.features.map((feature, idx) => (
+                <li key={idx} className={styles.serviceFeatureItem}>
+                  <div className={styles.serviceFeatureDot}></div>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.pageContainer}>
       {/* Hero Section */}
@@ -100,13 +176,13 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
           </p>
           <div className={styles.heroButtons}>
             <button
-              onClick={() => onNavigate(Page.CONTACT)}
+              onClick={() => handleNavigate(Page.CONTACT)}
               className={styles.primaryButton}
             >
               <Send size={16} /> Get Started Today
             </button>
             <button
-              onClick={() => onNavigate(Page.PROJECTS)}
+              onClick={() => handleNavigate(Page.PROJECTS)}
               className={styles.secondaryButton}
             >
               <Rocket size={16} /> View Our Work
@@ -140,19 +216,14 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                   </div>
                   
                   <h3 className={styles.serviceTitle}>{service.title}</h3>
-                  <p className={styles.serviceDescription}>{service.description}</p>
-                  
-                  <ul className={styles.serviceFeatures}>
-                    {service.features.map((feature, idx) => (
-                      <li key={idx} className={styles.serviceFeature}>
-                        <div className={styles.serviceFeatureDot}></div>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+                  <p className={styles.serviceDescription}>
+                    {service.description.length > 100 
+                      ? service.description.substring(0, 100) + '...' 
+                      : service.description}
+                  </p>
                   
                   <button
-                    onClick={() => onNavigate(Page.CONTACT)}
+                    onClick={() => handleViewService(service)}
                     className={styles.serviceButton}
                   >
                     Learn More <span>→</span>
@@ -203,13 +274,13 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
           </p>
           <div className={styles.ctaButtons}>
             <button
-              onClick={() => onNavigate(Page.CONTACT)}
+              onClick={() => handleNavigate(Page.CONTACT)}
               className={styles.ctaPrimaryButton}
             >
               <Send size={16} /> Schedule a Consultation
             </button>
             <button
-              onClick={() => onNavigate(Page.PROJECTS)}
+              onClick={() => handleNavigate(Page.PROJECTS)}
               className={styles.ctaSecondaryButton}
             >
               View Our Work

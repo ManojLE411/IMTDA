@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Github, FolderOpen } from 'lucide-react';
+import { ExternalLink, Github, FolderOpen, ArrowLeft } from 'lucide-react';
 import { Project } from '@/types/common.types';
 import { Tabs, EmptyState, SectionHeader, Badge } from '@/components/ui';
 import styles from './ProjectsPage.module.css';
@@ -73,12 +73,70 @@ const projectsData: Project[] = [
 
 export const ProjectsPage: React.FC = () => {
   const [filter, setFilter] = useState<string>('All');
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   
   const categories = ['All', 'AI/ML', 'Web', 'Data Science', 'IoT', 'VLSI'];
 
   const filteredProjects = filter === 'All' 
     ? projectsData 
     : projectsData.filter(p => p.category === filter);
+
+  // Scroll to top when viewing project
+  const handleViewProject = (project: Project) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelectedProject(project);
+  };
+
+  const handleBackToList = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelectedProject(null);
+  };
+
+  // If a project is selected, show detail view
+  if (selectedProject) {
+    return (
+      <div className={styles.projectDetail}>
+        <div className={styles.projectDetailContent}>
+          <button 
+            onClick={handleBackToList}
+            className={styles.backButton}
+          >
+            <ArrowLeft size={20} className={styles.backIcon} /> Back to Projects
+          </button>
+
+          <div className={styles.projectHeader}>
+            <Badge variant="primary" className={styles.projectCategory}>
+              {selectedProject.category}
+            </Badge>
+            <h1 className={styles.projectDetailTitle}>
+              {selectedProject.title}
+            </h1>
+            <p className={styles.projectDetailDescription}>
+              {selectedProject.description}
+            </p>
+          </div>
+
+          <div className={styles.projectImage}>
+            <img 
+              src={selectedProject.image} 
+              alt={selectedProject.title} 
+            />
+          </div>
+
+          <div className={styles.projectDetailContentSection}>
+            <h2 className={styles.projectTechStackTitle}>Technology Stack</h2>
+            <div className={styles.projectTechStackDetail}>
+              {selectedProject.techStack.map(tech => (
+                <Badge key={tech} variant="default" size="sm" className={styles.techTag}>
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.pageContainer}>
@@ -125,7 +183,10 @@ export const ProjectsPage: React.FC = () => {
                 </div>
 
                 <div className={styles.projectFooter}>
-                   <button className={styles.viewDetailsButton}>
+                   <button 
+                     onClick={() => handleViewProject(project)}
+                     className={styles.viewDetailsButton}
+                   >
                      View Details <FolderOpen className={styles.viewDetailsIcon} />
                    </button>
                    <div className={styles.projectLinks}>

@@ -1,10 +1,26 @@
-import React from 'react';
-import { MapPin, Briefcase, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MapPin, Briefcase, Clock, X, Upload } from 'lucide-react';
 import { useJobs } from '@/hooks/useJobs';
+import { useJobApplication } from '@/hooks/useJobApplication';
+import { useAuth } from '@/hooks/useAuth';
+import { Job } from '@/types/job.types';
+import { Alert } from '@/components/ui';
 import styles from './CareersPage.module.css';
 
 export const CareersPage: React.FC = () => {
   const { jobs } = useJobs();
+  const { applyForJob } = useJobApplication();
+  const { user: currentUser } = useAuth();
+  
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    resume: null as File | null,
+    coverLetter: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
 
   // Fallback jobs if none exist in storage
   const fallbackJobs = [
@@ -15,6 +31,73 @@ export const CareersPage: React.FC = () => {
   ];
 
   const displayJobs = jobs.length > 0 ? jobs : fallbackJobs;
+
+  // Prefill form if user is logged in
+  useEffect(() => {
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        name: currentUser.name,
+        email: currentUser.email,
+        phone: currentUser.phone || ''
+      }));
+    }
+  }, [currentUser]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData(prev => ({ ...prev, resume: e.target.files![0] }));
+    }
+  };
+
+  const handleApplyClick = (job: Job) => {
+    setSelectedJob(job);
+    setSubmitted(false);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedJob(null);
+    setSubmitted(false);
+    setFormData({
+      name: currentUser ? currentUser.name : '',
+      email: currentUser ? currentUser.email : '',
+      phone: currentUser ? currentUser.phone || '' : '',
+      resume: null,
+      coverLetter: ''
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedJob) return;
+    
+    const newApplication = {
+      id: Date.now().toString(),
+      jobId: selectedJob.id,
+      jobTitle: selectedJob.title,
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      resumeName: formData.resume ? formData.resume.name : 'No file uploaded',
+      coverLetter: formData.coverLetter,
+      date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+      status: 'Pending' as const,
+      userId: currentUser?.id
+    };
+
+    applyForJob(newApplication);
+    setSubmitted(true);
+    
+    // Reset after delay
+    setTimeout(() => {
+      handleCloseModal();
+    }, 3000);
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -64,7 +147,10 @@ export const CareersPage: React.FC = () => {
                    <span className={styles.jobMetaItem}><MapPin size={14} /> {job.location}</span>
                 </div>
               </div>
-              <button className={styles.applyButton}>
+              <button 
+                className={styles.applyButton}
+                onClick={() => handleApplyClick(job)}
+              >
                 Apply Now
               </button>
             </div>
@@ -75,6 +161,117 @@ export const CareersPage: React.FC = () => {
           <p>Don't see a matching role? Send your resume to <a href="mailto:careers@imtdainfotech.com" className={styles.footerLink}>careers@imtdainfotech.com</a></p>
         </div>
       </div>
+
+      {/* Application Modal */}
+      {selectedJob && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Apply for {selectedJob.title}</h2>
+              <button className={styles.modalCloseButton} onClick={handleCloseModal}>
+                <X size={24} />
+              </button>
+            </div>
+
+            {submitted ? (
+              <Alert
+                type="success"
+                title="Application Received!"
+                message={currentUser ? "Check your dashboard for status updates." : "Our team will review your profile and get back to you shortly."}
+                className={styles.successMessage}
+              />
+            ) : (
+              <form onSubmit={handleSubmit} className={styles.applicationForm}>
+                <div className={styles.formGrid}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Full Name</label>
+                    <input 
+                      type="text" 
+                      name="name"
+                      required 
+                      className={styles.input}
+                      placeholder="John Doe"
+                      onChange={handleInputChange}
+                      value={formData.name}
+                      readOnly={!!currentUser}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Email Address</label>
+                    <input 
+                      type="email" 
+                      name="email"
+                      required 
+                      className={styles.input}
+                      placeholder="john@example.com"
+                      onChange={handleInputChange}
+                      value={formData.email}
+                      readOnly={!!currentUser}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Phone Number</label>
+                  <input 
+                    type="tel" 
+                    name="phone"
+                    required 
+                    className={styles.input}
+                    placeholder="+1 (555) 123-4567"
+                    onChange={handleInputChange}
+                    value={formData.phone}
+                    readOnly={!!currentUser}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Resume/CV</label>
+                  <div className={styles.fileUpload}>
+                    <label htmlFor="resume-upload" className={styles.fileUploadLabel}>
+                      <div className={styles.fileUploadContent}>
+                        <Upload className={styles.fileUploadIcon} />
+                        <span className={styles.fileUploadText}>
+                          {formData.resume ? formData.resume.name : 'Click to upload or drag and drop'}
+                        </span>
+                        <span className={styles.fileUploadHint}>PDF, DOC, DOCX (Max 5MB)</span>
+                      </div>
+                      <input
+                        type="file"
+                        id="resume-upload"
+                        accept=".pdf,.doc,.docx"
+                        onChange={handleFileChange}
+                        className={styles.fileInput}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Cover Letter (Optional)</label>
+                  <textarea 
+                    name="coverLetter"
+                    rows={5}
+                    className={styles.textarea}
+                    placeholder="Tell us why you're interested in this position..."
+                    onChange={handleInputChange}
+                    value={formData.coverLetter}
+                  />
+                </div>
+
+                <div className={styles.formActions}>
+                  <button type="button" onClick={handleCloseModal} className={styles.cancelButton}>
+                    Cancel
+                  </button>
+                  <button type="submit" className={styles.submitButton}>
+                    Submit Application
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

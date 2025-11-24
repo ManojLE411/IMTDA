@@ -486,6 +486,7 @@
   overflow-x: auto;
   padding-bottom: 2rem;
   padding-left: 1rem;
+  padding-right: 1rem;
   scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
   scrollbar-width: none;

@@ -9,6 +9,11 @@ import { Mail, Phone, MapPin, Linkedin, Instagram, Twitter, Facebook, Lock } fro
 import styles from './Footer.module.css';
 
 export const Footer: React.FC = () => {
+  // Scroll to top when clicking footer links
+  const handleLinkClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -32,32 +37,32 @@ export const Footer: React.FC = () => {
             <h4 className={styles.sectionTitle}>Quick Links</h4>
             <ul className={styles.linksList}>
               <li>
-                <Link to="/" className={styles.footerLink}>
+                <Link to="/" className={styles.footerLink} onClick={handleLinkClick}>
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/about" className={styles.footerLink}>
+                <Link to="/about" className={styles.footerLink} onClick={handleLinkClick}>
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/services" className={styles.footerLink}>
+                <Link to="/services" className={styles.footerLink} onClick={handleLinkClick}>
                   Services
                 </Link>
               </li>
               <li>
-                <Link to="/projects" className={styles.footerLink}>
+                <Link to="/projects" className={styles.footerLink} onClick={handleLinkClick}>
                   Projects
                 </Link>
               </li>
               <li>
-                <Link to="/careers" className={styles.footerLink}>
+                <Link to="/careers" className={styles.footerLink} onClick={handleLinkClick}>
                   Careers
                 </Link>
               </li>
               <li>
-                <Link to="/blog" className={styles.footerLink}>
+                <Link to="/blog" className={styles.footerLink} onClick={handleLinkClick}>
                   Blog
                 </Link>
               </li>
@@ -69,17 +74,17 @@ export const Footer: React.FC = () => {
             <h4 className={styles.sectionTitle}>Services</h4>
             <ul className={styles.linksList}>
               <li>
-                <Link to="/internships" className={styles.footerLink}>
+                <Link to="/internships" className={styles.footerLink} onClick={handleLinkClick}>
                   Internships
                 </Link>
               </li>
               <li>
-                <Link to="/training" className={styles.footerLink}>
+                <Link to="/training" className={styles.footerLink} onClick={handleLinkClick}>
                   Training Programs
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className={styles.footerLink}>
+                <Link to="/contact" className={styles.footerLink} onClick={handleLinkClick}>
                   Contact Us
                 </Link>
               </li>
@@ -92,8 +97,8 @@ export const Footer: React.FC = () => {
             <ul className={styles.contactList}>
               <li className={styles.contactItem}>
                 <Mail size={16} />
-                <a href="mailto:info@imtda.com" className={styles.contactLink}>
-                  info@imtda.com
+                <a href="mailto:imtdainfotech@gmail.com" className={styles.contactLink}>
+                  imtdainfotech@gmail.com
                 </a>
               </li>
               <li className={styles.contactItem}>
@@ -104,7 +109,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className={styles.contactItemAddress}>
                 <MapPin size={16} className={styles.contactIcon} />
-                <span>Hyderabad, Telangana, India</span>
+                <span>Bheemunipatnam, Visakhapatnam, Andhra Pradesh – 531163, India</span>
               </li>
             </ul>
           </div>

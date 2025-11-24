@@ -573,6 +573,24 @@
   background-color: rgb(254, 242, 242);
 }
 
+.actionButtonApprove {
+  color: rgb(22, 163, 74);
+}
+
+.actionButtonApprove:hover {
+  color: rgb(21, 128, 61);
+  background-color: rgb(220, 252, 231);
+}
+
+.actionButtonReject {
+  color: rgb(239, 68, 68);
+}
+
+.actionButtonReject:hover {
+  color: rgb(220, 38, 38);
+  background-color: rgb(254, 242, 242);
+}
+
 /* Badges and Tags */
 .badge {
   display: inline-block;

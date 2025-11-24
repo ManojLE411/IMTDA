@@ -6,6 +6,13 @@ export interface InternshipTrack {
   skills: string[];
   description: string;
   image: string;
+  // Detailed information for the detail page
+  overview?: string;
+  programFlow?: string[];
+  whatYoullLearn?: string[];
+  programStructure?: string[];
+  whoShouldApply?: string[];
+  careerOutcomes?: string[];
 }
 
 export interface InternshipApplication {

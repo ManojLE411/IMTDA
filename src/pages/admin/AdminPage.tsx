@@ -6,6 +6,7 @@ import { useBlogPosts } from '@/hooks/useBlogPosts';
 import { useInternships } from '@/hooks/useInternships';
 import { useTrainingPrograms } from '@/hooks/useTrainingPrograms';
 import { useInternshipApplication } from '@/hooks/useInternshipApplication';
+import { useJobApplication } from '@/hooks/useJobApplication';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useContactMessages } from '@/hooks/useContactMessages';
 import { useTestimonials } from '@/hooks/useTestimonials';
@@ -35,7 +36,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
   const { posts, savePost, deletePost } = useBlogPosts();
   const { tracks: internships, saveTrack: saveInternship, deleteTrack: deleteInternship } = useInternships();
   const { programs, saveProgram, deleteProgram } = useTrainingPrograms();
-  const { applications, deleteApplication } = useInternshipApplication();
+  const { applications: internshipApplications, deleteApplication: deleteInternshipApplication, updateApplicationStatus: updateInternshipApplicationStatus } = useInternshipApplication();
+  const { applications: jobApplications, deleteApplication: deleteJobApplication, updateApplicationStatus: updateJobApplicationStatus } = useJobApplication();
   const { employees, saveEmployee, deleteEmployee } = useEmployees();
   const { messages: contactMessages, deleteMessage, markAsRead, markAsReplied } = useContactMessages();
   const { testimonials, saveTestimonial, deleteTestimonial } = useTestimonials();
@@ -94,7 +96,12 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
           deleteProgram(id);
           break;
         case 'applications':
-          deleteApplication(id);
+          // Check if it's an internship or job application
+          if (internshipApplications.some(app => app.id === id)) {
+            deleteInternshipApplication(id);
+          } else if (jobApplications.some(app => app.id === id)) {
+            deleteJobApplication(id);
+          }
           break;
         case 'employees':
           deleteEmployee(id);
@@ -113,7 +120,16 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
           break;
       }
     }
-  }, [deletePost, deleteInternship, deleteProgram, deleteApplication, deleteEmployee, deleteMessage, deleteTestimonial, deleteService, deleteJob]);
+  }, [deletePost, deleteInternship, deleteProgram, deleteInternshipApplication, deleteJobApplication, deleteEmployee, deleteMessage, deleteTestimonial, deleteService, deleteJob, internshipApplications, jobApplications]);
+
+  const handleUpdateApplicationStatus = useCallback((id: string, status: 'Approved' | 'Rejected') => {
+    // Check if it's an internship or job application
+    if (internshipApplications.some(app => app.id === id)) {
+      updateInternshipApplicationStatus(id, status);
+    } else if (jobApplications.some(app => app.id === id)) {
+      updateJobApplicationStatus(id, status);
+    }
+  }, [internshipApplications, jobApplications, updateInternshipApplicationStatus, updateJobApplicationStatus]);
 
   const handleCreatePost = useCallback(() => {
     setCurrentData({
@@ -263,7 +279,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
       case 'employees':
         return employees.length === 0;
       case 'applications':
-        return applications.length === 0;
+        return internshipApplications.length === 0 && jobApplications.length === 0;
       case 'messages':
         return contactMessages.length === 0;
       case 'testimonials':
@@ -275,7 +291,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
       default:
         return false;
     }
-  }, [activeTab, posts.length, internships.length, programs.length, employees.length, applications.length, contactMessages.length, testimonials.length, services.length, jobs.length]);
+  }, [activeTab, posts.length, internships.length, programs.length, employees.length, internshipApplications.length, jobApplications.length, contactMessages.length, testimonials.length, services.length, jobs.length]);
 
   const tableColSpan = useMemo(() => {
     return (activeTab === 'applications' || activeTab === 'messages') ? 4 : 3;
@@ -300,7 +316,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
       case 'messages':
         return 'Contact Messages';
       case 'applications':
-        return 'Application Requests';
+        return 'All Applications';
       case 'testimonials':
         return 'All Testimonials';
       case 'services':
@@ -773,12 +789,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                     </tr>
                   ))}
 
-                  {/* Applications View */}
-                  {activeTab === 'applications' && applications.map(app => (
+                  {/* Applications View - Internship Applications */}
+                  {activeTab === 'applications' && internshipApplications.length > 0 && internshipApplications.map(app => (
                      <tr key={app.id} className={styles.tableRow}>
                       <td className={styles.tableCell}>
                          <div className={styles.applicantName}>{app.name}</div>
                          <div className={styles.dateText}><Calendar size={12}/> {app.date}</div>
+                         <div className={styles.badge} style={{ marginTop: '0.5rem', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#60A5FA' }}>Internship</div>
                       </td>
                       <td className={`${styles.tableCell} ${styles.tableCellSmall}`}>
                          <div className={styles.textPrimary}>{app.course}</div>
@@ -807,6 +824,84 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                       <td className={styles.tableCell}>
                         <div className={styles.actionButtons}>
+                          {app.status === 'Pending' && (
+                            <>
+                              <button 
+                                onClick={() => handleUpdateApplicationStatus(app.id, 'Approved')} 
+                                className={`${styles.actionButton} ${styles.actionButtonApprove} ${styles.actionButtonSmall}`} 
+                                title="Approve Application"
+                              >
+                                <CheckCircle size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleUpdateApplicationStatus(app.id, 'Rejected')} 
+                                className={`${styles.actionButton} ${styles.actionButtonReject} ${styles.actionButtonSmall}`} 
+                                title="Reject Application"
+                              >
+                                <XCircle size={18} />
+                              </button>
+                            </>
+                          )}
+                          <button onClick={() => handleDelete(app.id, 'applications')} className={`${styles.actionButton} ${styles.actionButtonDelete} ${styles.actionButtonSmall}`} title="Delete Application"><Trash2 size={18} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Applications View - Job Applications */}
+                  {activeTab === 'applications' && jobApplications.length > 0 && jobApplications.map(app => (
+                     <tr key={app.id} className={styles.tableRow}>
+                      <td className={styles.tableCell}>
+                         <div className={styles.applicantName}>{app.name}</div>
+                         <div className={styles.dateText}><Calendar size={12}/> {app.date}</div>
+                         <div className={styles.badge} style={{ marginTop: '0.5rem', backgroundColor: 'rgba(139, 92, 246, 0.1)', color: '#A78BFA' }}>Job Application</div>
+                      </td>
+                      <td className={`${styles.tableCell} ${styles.tableCellSmall}`}>
+                         <div className={styles.textPrimary}>{app.jobTitle}</div>
+                         <div className={styles.contactInfo}>
+                            <span className={styles.contactInfoItem}><Mail size={12} /> {app.email}</span>
+                            <span className={styles.contactInfoItem}><Phone size={12} /> {app.phone}</span>
+                         </div>
+                         <div className={`${styles.statusBadge} ${
+                           app.status === 'Approved' ? styles.statusBadgeApproved : 
+                           app.status === 'Rejected' ? styles.statusBadgeRejected : 
+                           styles.statusBadgePending
+                         }`}>
+                           {app.status === 'Approved' ? <CheckCircle size={10} /> : 
+                            app.status === 'Rejected' ? <XCircle size={10} /> : 
+                            <Clock size={10} />} {app.status}
+                         </div>
+                      </td>
+                      <td className={`${styles.tableCell} ${styles.tableCellSmall}`}>
+                         <div className={styles.resumeLink}>
+                            <FileText size={14} /> 
+                            <span className={styles.resumeName} title={app.resumeName}>{app.resumeName}</span>
+                         </div>
+                         {app.coverLetter && (
+                           <div className={styles.messagePreview} title={app.coverLetter}>
+                             "{app.coverLetter}"
+                           </div>
+                         )}
+                      </td>
+                      <td className={styles.tableCell}>
+                        <div className={styles.actionButtons}>
+                          {app.status === 'Pending' && (
+                            <>
+                              <button 
+                                onClick={() => handleUpdateApplicationStatus(app.id, 'Approved')} 
+                                className={`${styles.actionButton} ${styles.actionButtonApprove} ${styles.actionButtonSmall}`} 
+                                title="Approve Application"
+                              >
+                                <CheckCircle size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleUpdateApplicationStatus(app.id, 'Rejected')} 
+                                className={`${styles.actionButton} ${styles.actionButtonReject} ${styles.actionButtonSmall}`} 
+                                title="Reject Application"
+                              >
+                                <XCircle size={18} />
+                              </button>
+                            </>
+                          )}
                           <button onClick={() => handleDelete(app.id, 'applications')} className={`${styles.actionButton} ${styles.actionButtonDelete} ${styles.actionButtonSmall}`} title="Delete Application"><Trash2 size={18} /></button>
                         </div>
                       </td>

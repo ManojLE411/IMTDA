@@ -88,6 +88,18 @@ export const deleteInternshipApplication = createAsyncThunk(
   }
 );
 
+/**
+ * Update internship application status
+ */
+export const updateInternshipApplicationStatus = createAsyncThunk(
+  'internship/updateApplicationStatus',
+  async ({ id, status }: { id: string; status: InternshipApplication['status'] }, { dispatch }) => {
+    internshipStorage.updateApplicationStatus(id, status);
+    dispatch(loadInternshipApplications());
+    return { id, status };
+  }
+);
+
 const internshipSlice = createSlice({
   name: 'internship',
   initialState,
@@ -138,6 +150,9 @@ const internshipSlice = createSlice({
       })
       .addCase(deleteInternshipApplication.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to delete application';
+      })
+      .addCase(updateInternshipApplicationStatus.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to update application status';
       });
   },
 });

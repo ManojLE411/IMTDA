@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTrainingPrograms } from '@/hooks/useTrainingPrograms';
 import { BookOpen, Briefcase, Award } from 'lucide-react';
 import { Loading, EmptyState, SectionHeader } from '@/components/ui';
 import styles from './TrainingPage.module.css';
 
 export const TrainingPage: React.FC = () => {
+  const navigate = useNavigate();
   const { programs, loading } = useTrainingPrograms();
 
   // Fallback training programs if none exist in storage
@@ -65,6 +67,35 @@ export const TrainingPage: React.FC = () => {
 
   const displayPrograms = programs.length > 0 ? programs : fallbackPrograms;
 
+  const handleInquire = (programTitle: string, isInstitutional: boolean) => {
+    const subject = isInstitutional 
+      ? 'Institutional Training Inquiry' 
+      : 'Corporate Training Partnership';
+    
+    const message = isInstitutional
+      ? `I am interested in learning more about the "${programTitle}" program for my institution. Please provide more details about the curriculum, duration, and partnership opportunities.`
+      : `I am interested in partnering with IMTDA Infotech for the "${programTitle}" training program for my organization. Please provide more information about corporate training solutions and partnership options.`;
+
+    navigate('/contact', {
+      state: {
+        subject,
+        programTitle,
+        inquiryType: isInstitutional ? 'institutional' : 'corporate',
+        message
+      }
+    });
+  };
+
+  const handleGeneralTrainingInquiry = () => {
+    navigate('/contact', {
+      state: {
+        subject: 'Training Program Inquiry',
+        inquiryType: 'general',
+        message: 'I would like to learn more about your professional training programs. Please provide information about available programs, schedules, and enrollment options.'
+      }
+    });
+  };
+
   if (loading) {
     return <Loading text="Loading..." fullScreen />;
   }
@@ -97,7 +128,10 @@ export const TrainingPage: React.FC = () => {
                     </li>
                   ))}
                 </ul>
-                <button className={`${styles.programButton} ${isInstitutional ? styles.programButtonInstitutional : styles.programButtonCorporate}`}>
+                <button 
+                  onClick={() => handleInquire(program.title, isInstitutional)}
+                  className={`${styles.programButton} ${isInstitutional ? styles.programButtonInstitutional : styles.programButtonCorporate}`}
+                >
                   {isInstitutional ? 'Inquire for College' : 'Partner With Us'}
                 </button>
               </div>
@@ -112,7 +146,10 @@ export const TrainingPage: React.FC = () => {
              <Award className={styles.ctaIcon} />
              <h2 className={styles.ctaTitle}>Ready to Upskill Your Team?</h2>
              <p className={styles.ctaDescription}>Enhance your team's capabilities with our professional training programs in AI, software development, cloud technologies, and more.</p>
-             <button className={styles.ctaButton}>
+             <button 
+               onClick={handleGeneralTrainingInquiry}
+               className={styles.ctaButton}
+             >
                Enquire About Training
              </button>
            </div>

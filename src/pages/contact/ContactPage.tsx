@@ -1,19 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Mail, Phone, Send, MessageCircle } from 'lucide-react';
 import { useContactMessages } from '@/hooks/useContactMessages';
+import { useLocation } from 'react-router-dom';
 import { Alert } from '@/components/ui';
 import styles from './ContactPage.module.css';
 
+interface LocationState {
+  subject?: string;
+  programTitle?: string;
+  inquiryType?: 'institutional' | 'corporate' | 'general';
+  message?: string;
+}
+
 export const ContactPage: React.FC = () => {
   const { submitMessage } = useContactMessages();
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: 'General Inquiry',
-    message: ''
+    subject: locationState?.subject || 'General Inquiry',
+    message: locationState?.message || ''
   });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  // Update form data when location state changes (e.g., navigating from training page)
+  useEffect(() => {
+    if (locationState) {
+      setFormData(prev => ({
+        ...prev,
+        subject: locationState.subject || prev.subject,
+        message: locationState.message || prev.message
+      }));
+      
+      // Scroll to form when coming from training page
+      setTimeout(() => {
+        const formElement = document.querySelector(`.${styles.contactForm}`);
+        if (formElement) {
+          formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [locationState]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -179,6 +209,9 @@ export const ContactPage: React.FC = () => {
                     required
                   >
                     <option value="General Inquiry">General Inquiry</option>
+                    <option value="Institutional Training Inquiry">Institutional Training Inquiry</option>
+                    <option value="Corporate Training Partnership">Corporate Training Partnership</option>
+                    <option value="Training Program Inquiry">Training Program Inquiry</option>
                     <option value="Internship Partnership">Internship Partnership</option>
                     <option value="Project Consultation">Project Consultation</option>
                     <option value="Careers">Careers</option>

@@ -5,9 +5,16 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
+      base: '/', // Explicitly set to root-relative paths
       server: {
         port: 3000,
         host: '0.0.0.0',
+        strictPort: false,
+        hmr: {
+          protocol: 'ws',
+          host: 'localhost',
+          port: 3000,
+        },
       },
       plugins: [react()],
       define: {
@@ -17,12 +24,25 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, './src')
-        }
+        },
+        extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
       },
       optimizeDeps: {
         include: ['react-router-dom', 'react-router'],
         exclude: [],
-        force: true
+        force: true,
+        esbuildOptions: {
+          target: 'esnext',
+        },
+      },
+      build: {
+        target: 'esnext',
+        modulePreload: false,
+        rollupOptions: {
+          output: {
+            manualChunks: undefined,
+          },
+        },
       },
       ssr: {
         noExternal: ['react-router-dom']

@@ -11,6 +11,7 @@ import {
   loadInternshipApplications,
   applyForInternship,
   deleteInternshipApplication,
+  updateInternshipApplicationStatus,
 } from '@/store/slices/internshipSlice';
 import { InternshipApplication } from '@/types/internship.types';
 
@@ -20,7 +21,7 @@ import { InternshipApplication } from '@/types/internship.types';
  */
 export const useInternshipApplication = () => {
   const dispatch = useAppDispatch();
-  const applications = useAppSelector(selectInternshipApplications);
+  const applications = useAppSelector(selectInternshipApplications) || [];
   const loading = useAppSelector(selectApplicationsLoading);
 
   useEffect(() => {
@@ -35,6 +36,9 @@ export const useInternshipApplication = () => {
     },
     deleteApplication: (id: string) => {
       dispatch(deleteInternshipApplication(id));
+    },
+    updateApplicationStatus: (id: string, status: InternshipApplication['status']) => {
+      dispatch(updateInternshipApplicationStatus({ id, status }));
     },
   };
 };

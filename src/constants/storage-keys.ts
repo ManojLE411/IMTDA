@@ -15,5 +15,6 @@ export const STORAGE_KEYS = {
   TESTIMONIALS: 'imtda_testimonials',
   SERVICES: 'imtda_services',
   JOBS: 'imtda_jobs',
+  JOB_APPLICATIONS: 'imtda_job_applications',
 } as const;
 

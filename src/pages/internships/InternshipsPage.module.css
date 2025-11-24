@@ -40,6 +40,410 @@
   color: rgb(203, 213, 225);
 }
 
+/* Track Detail View */
+.trackDetail {
+  background-color: rgb(2, 6, 23);
+  color: rgb(241, 245, 249);
+  min-height: 100vh;
+  padding: 3rem 0;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.trackDetailContent {
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .trackDetailContent {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .trackDetailContent {
+    padding: 0 2rem;
+    max-width: 64rem;
+  }
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  color: #1E3A8A;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+  width: fit-content;
+}
+
+.backButton:hover {
+  text-decoration: underline;
+}
+
+.backIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.trackDetail .trackHeader {
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+
+.trackDetail .trackTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .trackDetail .trackTitle {
+    font-size: 3rem;
+  }
+}
+
+.trackDetail .trackMeta {
+  display: flex;
+  align-items: center;
+  color: rgb(148, 163, 184);
+  font-size: 0.875rem;
+  gap: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 2rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.trackDetail .trackMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trackDetailImage {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin-bottom: 3rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .trackDetailImage {
+    height: 450px;
+  }
+}
+
+.trackDetailImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trackDetail .trackContent {
+  color: rgb(203, 213, 225);
+  line-height: 1.75;
+  font-size: 1.125rem;
+  max-width: none;
+  width: 100%;
+}
+
+.trackDetail .trackDescription {
+  color: rgb(203, 213, 225);
+  line-height: 1.75;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.overviewContent {
+  width: 100%;
+}
+
+.overviewContent p {
+  color: rgb(203, 213, 225);
+  line-height: 1.75;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* Content Sections */
+.contentSection {
+  margin-bottom: 3rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.contentSection:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .sectionTitle {
+    font-size: 1.75rem;
+  }
+}
+
+.sectionIcon {
+  color: #60A5FA;
+}
+
+/* Program Flow */
+.flowList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.flowItem {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .flowItem {
+    gap: 1.5rem;
+  }
+}
+
+.flowNumber {
+  min-width: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .flowNumber {
+    min-width: 3rem;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+}
+
+.flowContent {
+  flex: 1;
+  padding-top: 0.25rem;
+  min-width: 0;
+}
+
+.flowContent p {
+  color: rgb(203, 213, 225);
+  line-height: 1.75;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* What You'll Learn */
+.learnList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .learnList {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 1.5rem;
+  }
+}
+
+.learnItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: rgb(203, 213, 225);
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.learnItem span {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkIcon {
+  color: #34D399;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+/* Skills Section */
+.trackSkillsSection {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skillsTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.trackDetail .trackSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* Program Structure */
+.structureList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .structureList {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 1.5rem;
+  }
+}
+
+.structureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  color: rgb(203, 213, 225);
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.structureItem span {
+  flex: 1;
+  min-width: 0;
+}
+
+.structureBullet {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #60A5FA;
+  border-radius: 50%;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Who Should Apply */
+.applyList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .applyList {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem 1.25rem;
+  }
+}
+
+.applyItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: rgb(203, 213, 225);
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.applyItem span {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Career Outcomes */
+.careerList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .careerList {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+.careerItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background-color: rgba(30, 58, 138, 0.1);
+  border: 1px solid rgba(30, 58, 138, 0.3);
+  border-radius: 0.5rem;
+  color: rgb(203, 213, 225);
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.careerItem:hover {
+  background-color: rgba(30, 58, 138, 0.2);
+  border-color: rgba(30, 58, 138, 0.5);
+  transform: translateX(0.25rem);
+}
+
+.careerItem span {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.careerIcon {
+  color: #60A5FA;
+  flex-shrink: 0;
+}
+
 /* Header */
 .header {
   text-align: center;
@@ -90,6 +494,7 @@
   transition: all 0.3s;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 @media (min-width: 768px) {
@@ -102,6 +507,10 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-0.25rem);
+}
+
+.trackCard:hover .trackTitle {
+  color: #60A5FA;
 }
 
 .trackImageContainer {
@@ -198,6 +607,32 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+
+.trackCardFooter {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #60A5FA;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.trackCardFooter svg {
+  margin-left: 0.25rem;
+  transition: transform 0.2s;
+}
+
+.trackCard:hover .trackCardFooter {
+  color: #93C5FD;
+}
+
+.trackCard:hover .trackCardFooter svg {
+  transform: translateX(0.5rem);
 }
 
 /* Application Form */

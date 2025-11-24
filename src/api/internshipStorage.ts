@@ -26,6 +26,14 @@ class InternshipStorage extends BaseStorage<InternshipTrack> {
     const filtered = applications.filter(a => a.id !== id);
     StorageService.set(this.applicationKey, filtered);
   }
+
+  updateApplicationStatus(id: string, status: InternshipApplication['status']): void {
+    const applications = this.getAllApplications();
+    const updated = applications.map(app =>
+      app.id === id ? { ...app, status } : app
+    );
+    StorageService.set(this.applicationKey, updated);
+  }
 }
 
 export const internshipStorage = new InternshipStorage();

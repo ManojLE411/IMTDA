@@ -8,4 +8,5 @@ export { useContactMessages } from './useContactMessages';
 export { useTestimonials } from './useTestimonials';
 export { useServices } from './useServices';
 export { useJobs } from './useJobs';
+export { useJobApplication } from './useJobApplication';
 
