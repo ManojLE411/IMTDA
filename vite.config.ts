@@ -108,6 +108,11 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      preview: {
+        port: Number(process.env.PORT) || 3000,
+        host: '0.0.0.0',
+        strictPort: false,
+      },
       ssr: {
         noExternal: ['react-router-dom']
       }
