@@ -9,63 +9,7 @@ export const TrainingPage: React.FC = () => {
   const navigate = useNavigate();
   const { programs, loading } = useTrainingPrograms();
 
-  // Fallback training programs if none exist in storage
-  const fallbackPrograms = [
-    {
-      id: '1',
-      title: 'AI & Machine Learning Bootcamp',
-      category: 'Institutional' as const,
-      description: 'Comprehensive training in artificial intelligence, deep learning, and data science for students and professionals.',
-      features: [
-        'Python Programming Fundamentals',
-        'Neural Networks & Deep Learning',
-        'Computer Vision & NLP',
-        'Real-world Project Portfolio',
-        'Industry Mentorship'
-      ]
-    },
-    {
-      id: '2',
-      title: 'Full Stack Web Development',
-      category: 'Corporate' as const,
-      description: 'Enterprise-grade web development training covering modern frameworks and best practices.',
-      features: [
-        'React & Node.js Mastery',
-        'Database Design & Optimization',
-        'API Development & Integration',
-        'DevOps & Deployment',
-        'Code Review & Best Practices'
-      ]
-    },
-    {
-      id: '3',
-      title: 'Cloud Computing & DevOps',
-      category: 'Corporate' as const,
-      description: 'Hands-on training in cloud platforms, containerization, and CI/CD pipelines.',
-      features: [
-        'AWS/Azure/GCP Fundamentals',
-        'Docker & Kubernetes',
-        'Infrastructure as Code',
-        'CI/CD Pipeline Setup',
-        'Monitoring & Scaling'
-      ]
-    },
-    {
-      id: '4',
-      title: 'VLSI Design & Verification',
-      category: 'Institutional' as const,
-      description: 'Advanced semiconductor design training for engineering students and professionals.',
-      features: [
-        'RTL Design with Verilog',
-        'SystemVerilog & UVM',
-        'FPGA Implementation',
-        'ASIC Design Flow',
-        'Industry Tools & Methodologies'
-      ]
-    }
-  ];
-
-  const displayPrograms = programs.length > 0 ? programs : fallbackPrograms;
+  const displayPrograms = programs || [];
 
   const handleInquire = (programTitle: string, isInstitutional: boolean) => {
     const subject = isInstitutional 

@@ -5,7 +5,8 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Testimonial } from '@/types/testimonial.types';
-import { testimonialStorage } from '@/api/testimonialStorage';
+import { testimonialApi } from '@/services/testimonialApi';
+import { isValidObjectId } from '@/utils/validation';
 
 interface TestimonialState {
   testimonials: Testimonial[];
@@ -20,10 +21,10 @@ const initialState: TestimonialState = {
 };
 
 /**
- * Load testimonials from storage
+ * Load testimonials from API
  */
 export const loadTestimonials = createAsyncThunk('testimonial/load', async () => {
-  return testimonialStorage.getAll();
+  return testimonialApi.getAll();
 });
 
 /**
@@ -32,9 +33,10 @@ export const loadTestimonials = createAsyncThunk('testimonial/load', async () =>
 export const saveTestimonial = createAsyncThunk(
   'testimonial/save',
   async (testimonial: Testimonial, { dispatch }) => {
-    testimonialStorage.save(testimonial);
+    const { id, ...testimonialData } = testimonial;
+    const savedTestimonial = id && isValidObjectId(id) ? await testimonialApi.update(id, testimonialData) : await testimonialApi.create(testimonialData);
     dispatch(loadTestimonials());
-    return testimonial;
+    return savedTestimonial;
   }
 );
 
@@ -44,7 +46,7 @@ export const saveTestimonial = createAsyncThunk(
 export const deleteTestimonial = createAsyncThunk(
   'testimonial/delete',
   async (id: string, { dispatch }) => {
-    testimonialStorage.delete(id);
+    await testimonialApi.delete(id);
     dispatch(loadTestimonials());
     return id;
   }
@@ -66,15 +68,25 @@ const testimonialSlice = createSlice({
       })
       .addCase(loadTestimonials.fulfilled, (state, action) => {
         state.loading = false;
-        state.testimonials = action.payload;
+        // Ensure payload is an array and has id fields
+        state.testimonials = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(loadTestimonials.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to load testimonials';
-        state.testimonials = [];
+        // Keep existing testimonials on error instead of clearing
+        if (state.testimonials.length === 0) {
+          state.testimonials = [];
+        }
+      })
+      .addCase(saveTestimonial.fulfilled, (state) => {
+        // Testimonials are already updated via loadTestimonials
       })
       .addCase(saveTestimonial.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to save testimonial';
+      })
+      .addCase(deleteTestimonial.fulfilled, (state) => {
+        // Testimonials are already updated via loadTestimonials
       })
       .addCase(deleteTestimonial.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to delete testimonial';
@@ -85,7 +97,7 @@ const testimonialSlice = createSlice({
 export const { clearError } = testimonialSlice.actions;
 
 // Selectors
-export const selectTestimonials = (state: { testimonial: TestimonialState }) => state.testimonial.testimonials;
+export const selectTestimonials = (state: { testimonial: TestimonialState }) => state.testimonial?.testimonials || [];
 export const selectTestimonialLoading = (state: { testimonial: TestimonialState }) =>
   state.testimonial.loading;
 export const selectTestimonialError = (state: { testimonial: TestimonialState }) => state.testimonial.error;

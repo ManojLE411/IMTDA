@@ -38,6 +38,10 @@ class ApiClient {
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        // If FormData is being sent, remove Content-Type header to let browser set it with boundary
+        if (config.data instanceof FormData && config.headers) {
+          delete config.headers['Content-Type'];
+        }
         return config;
       },
       (error: AxiosError) => {
@@ -56,27 +60,53 @@ class ApiClient {
           originalRequest._retry = true;
           this.clearAuth();
           
-          // Only redirect if not already on login page
-          if (window.location.pathname !== AUTH_CONFIG.LOGIN_ROUTE) {
+          // Only redirect if not already on login page and not during initialization
+          // Skip redirect for /auth/me endpoint during app initialization
+          const isAuthMeEndpoint = originalRequest.url?.includes('/auth/me');
+          if (!isAuthMeEndpoint && window.location.pathname !== AUTH_CONFIG.LOGIN_ROUTE) {
             window.location.href = AUTH_CONFIG.LOGIN_ROUTE;
           }
           
           return Promise.reject(error);
         }
 
-        // Handle network errors
+        // Handle 429 Too Many Requests - Log but don't redirect
+        if (error.response?.status === 429) {
+          console.warn('Rate limit exceeded. Please wait a moment before making more requests.');
+          return Promise.reject(error);
+        }
+
+        // Handle network errors (including ERR_NETWORK_CHANGED, ECONNREFUSED, etc.)
         if (!error.response) {
+          // Check for specific network error codes
+          const errorCode = (error.code || error.message || '').toUpperCase();
+          let errorMessage: string = ERROR_MESSAGES.NETWORK_ERROR;
+          
+          if (errorCode.includes('NETWORK_CHANGED') || errorCode.includes('ERR_NETWORK')) {
+            errorMessage = 'Connection interrupted. The server may have restarted. Please refresh the page or wait a moment and try again.';
+          } else if (errorCode.includes('ECONNREFUSED') || errorCode.includes('CONNREFUSED')) {
+            errorMessage = 'Cannot connect to server. Please ensure the backend server is running on port 5000.';
+          } else if (errorCode.includes('TIMEOUT') || errorCode.includes('ETIMEDOUT')) {
+            errorMessage = ERROR_MESSAGES.TIMEOUT;
+          } else if (errorCode.includes('ABORTED') || errorCode.includes('CANCELED')) {
+            errorMessage = 'Request was cancelled.';
+          }
+          
           const networkError: ApiError = {
-            message: ERROR_MESSAGES.NETWORK_ERROR,
+            message: errorMessage,
             code: 'NETWORK_ERROR',
           };
           return Promise.reject(networkError);
         }
 
         // Handle API errors
-        const errorCode = error.response.data?.code;
+        // Backend returns { success: false, error: { code, message } }
+        const backendError = error.response.data as any;
+        const errorCode = backendError?.error?.code || backendError?.code;
+        const errorMessage = backendError?.error?.message || backendError?.message || error.message || getErrorMessage(errorCode);
+        
         const apiError: ApiError = {
-          message: error.response.data?.message || error.message || getErrorMessage(errorCode),
+          message: errorMessage,
           code: errorCode,
           status: error.response.status,
         };

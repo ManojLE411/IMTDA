@@ -9,4 +9,5 @@ export { TrainingForm } from './TrainingForm';
 export { TestimonialForm } from './TestimonialForm';
 export { ServiceForm } from './ServiceForm';
 export { JobForm } from './JobForm';
+export { ProjectForm } from './ProjectForm';
 

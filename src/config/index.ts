@@ -12,8 +12,12 @@ export const nodeEnv = import.meta.env.MODE || 'development';
  * API Configuration
  */
 export const API_CONFIG = {
-  // Base URL for API requests (empty string means relative URLs)
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || '',
+  // Base URL for API requests
+  // In development, use empty string to leverage Vite proxy
+  // In production, use the full API URL from .env
+  BASE_URL: import.meta.env.PROD 
+    ? import.meta.env.VITE_API_BASE_URL 
+    : '', // Empty string in dev = use Vite proxy
   
   // Request timeout in milliseconds
   TIMEOUT: 30000, // 30 seconds
@@ -45,6 +49,7 @@ export const AUTH_CONFIG = {
  */
 export const EXTERNAL_APIS = {
   GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '',
+  GOOGLE_MAPS_EMBED_URL: import.meta.env.VITE_GOOGLE_MAPS_EMBED_URL || '',
 } as const;
 
 /**

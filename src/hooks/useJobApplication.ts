@@ -13,6 +13,7 @@ import {
   deleteJobApplication,
   updateJobApplicationStatus,
 } from '@/store/slices/jobSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { JobApplication } from '@/types/job.types';
 
 /**
@@ -23,16 +24,19 @@ export const useJobApplication = () => {
   const dispatch = useAppDispatch();
   const applications = useAppSelector(selectJobApplications) || [];
   const loading = useAppSelector(selectJobApplicationsLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadJobApplications());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadJobApplications());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     applications,
     loading,
-    applyForJob: (application: JobApplication) => {
-      dispatch(applyForJob(application));
+    applyForJob: (application: JobApplication, resumeFile?: File) => {
+      dispatch(applyForJob({ application, resumeFile }));
     },
     deleteApplication: (id: string) => {
       dispatch(deleteJobApplication(id));

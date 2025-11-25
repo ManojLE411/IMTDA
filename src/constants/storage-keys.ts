@@ -16,5 +16,6 @@ export const STORAGE_KEYS = {
   SERVICES: 'imtda_services',
   JOBS: 'imtda_jobs',
   JOB_APPLICATIONS: 'imtda_job_applications',
+  PROJECTS: 'imtda_projects',
 } as const;
 

@@ -17,7 +17,8 @@ export interface JobApplication {
   name: string;
   email: string;
   phone: string;
-  resumeName: string; // Storing filename to simulate upload
+  resumeName?: string; // Storing filename to simulate upload
+  resumePath?: string; // Path to uploaded resume file
   coverLetter?: string;
   date: string;
   status: 'Pending' | 'Approved' | 'Rejected';

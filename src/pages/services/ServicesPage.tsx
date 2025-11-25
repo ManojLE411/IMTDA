@@ -28,53 +28,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate: onNaviga
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const { services } = useServices();
 
-  // Fallback services if none exist in storage
-  const fallbackServices = [
-    {
-      id: '1',
-      title: 'Custom Software Development',
-      icon: 'Code',
-      description: 'End-to-end software solutions tailored to your business needs. From web applications to enterprise systems.',
-      features: ['Full Stack Development', 'Microservices Architecture', 'API Development', 'Legacy System Modernization']
-    },
-    {
-      id: '2',
-      title: 'AI & Machine Learning Solutions',
-      icon: 'Brain',
-      description: 'Intelligent automation and predictive analytics powered by cutting-edge AI/ML technologies.',
-      features: ['Custom AI Models', 'Computer Vision', 'Natural Language Processing', 'Predictive Analytics']
-    },
-    {
-      id: '3',
-      title: 'Cloud Infrastructure & DevOps',
-      icon: 'Cloud',
-      description: 'Scalable cloud solutions and automated deployment pipelines for seamless operations.',
-      features: ['AWS/Azure/GCP Setup', 'CI/CD Pipelines', 'Container Orchestration', 'Infrastructure as Code']
-    },
-    {
-      id: '4',
-      title: 'Data Engineering & Analytics',
-      icon: 'Database',
-      description: 'Transform raw data into actionable insights with robust data pipelines and analytics platforms.',
-      features: ['Data Pipeline Development', 'ETL/ELT Solutions', 'Business Intelligence', 'Real-time Analytics']
-    },
-    {
-      id: '5',
-      title: 'Mobile App Development',
-      icon: 'Smartphone',
-      description: 'Native and cross-platform mobile applications for iOS and Android with modern frameworks.',
-      features: ['iOS & Android Apps', 'React Native', 'Flutter Development', 'App Store Deployment']
-    },
-    {
-      id: '6',
-      title: 'Cybersecurity Solutions',
-      icon: 'Shield',
-      description: 'Comprehensive security audits, penetration testing, and secure architecture design.',
-      features: ['Security Audits', 'Penetration Testing', 'Secure Code Review', 'Compliance Consulting']
-    },
-  ];
-
-  const softwareServices = services.length > 0 ? services : fallbackServices;
+  const softwareServices = services || [];
 
   const processSteps = [
     {
@@ -124,15 +78,28 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate: onNaviga
           </button>
 
           <div className={styles.serviceHeader}>
-            <div className={styles.serviceIconContainer}>
-              <Icon className={styles.serviceDetailIcon} />
+            <span className={styles.serviceCategory}>
+              {selectedService.icon || 'Service'}
+            </span>
+            <div className={styles.serviceTitleSection}>
+              <div className={styles.serviceIconContainer}>
+                <Icon className={styles.serviceDetailIcon} />
+              </div>
+              <h1 className={styles.serviceDetailTitle}>
+                {selectedService.title}
+              </h1>
             </div>
-            <h1 className={styles.serviceDetailTitle}>
-              {selectedService.title}
-            </h1>
             <p className={styles.serviceDetailDescription}>
               {selectedService.description}
             </p>
+            <div className={styles.serviceMeta}>
+              <span className={styles.serviceMetaItem}>
+                <Rocket size={16} /> Software Solutions
+              </span>
+              <span className={styles.serviceMetaItem}>
+                <Send size={16} /> Get Started
+              </span>
+            </div>
           </div>
 
           {selectedService.image && (
@@ -145,15 +112,41 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate: onNaviga
           )}
 
           <div className={styles.serviceContent}>
-            <h2 className={styles.serviceFeaturesTitle}>Key Features</h2>
-            <ul className={styles.serviceFeaturesList}>
+            <h2 className={styles.serviceFeaturesTitle}>Key Features & Capabilities</h2>
+            <p className={styles.serviceFeaturesIntro}>
+              Our comprehensive service includes the following features and capabilities designed to meet your business needs:
+            </p>
+            <div className={styles.serviceFeaturesGrid}>
               {selectedService.features.map((feature, idx) => (
-                <li key={idx} className={styles.serviceFeatureItem}>
-                  <div className={styles.serviceFeatureDot}></div>
-                  {feature}
-                </li>
+                <div key={idx} className={styles.serviceFeatureCard}>
+                  <div className={styles.serviceFeatureIcon}>
+                    <div className={styles.serviceFeatureDot}></div>
+                  </div>
+                  <p className={styles.serviceFeatureText}>{feature}</p>
+                </div>
               ))}
-            </ul>
+            </div>
+          </div>
+
+          <div className={styles.serviceCta}>
+            <h3 className={styles.serviceCtaTitle}>Ready to Get Started?</h3>
+            <p className={styles.serviceCtaDescription}>
+              Let's discuss how {selectedService.title} can transform your business and drive innovation.
+            </p>
+            <div className={styles.serviceCtaButtons}>
+              <button
+                onClick={() => handleNavigate(Page.CONTACT)}
+                className={styles.serviceCtaPrimary}
+              >
+                <Send size={16} /> Contact Us
+              </button>
+              <button
+                onClick={handleBackToList}
+                className={styles.serviceCtaSecondary}
+              >
+                View All Services
+              </button>
+            </div>
           </div>
         </div>
       </div>

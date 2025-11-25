@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page } from '@/constants';
-import { BlogPostForm, InternshipForm, TrainingForm, EmployeeForm, TestimonialForm, ServiceForm, JobForm } from '@/components/forms';
+import { BlogPostForm, InternshipForm, TrainingForm, EmployeeForm, TestimonialForm, ServiceForm, JobForm, ProjectForm } from '@/components/forms';
 import { useBlogPosts } from '@/hooks/useBlogPosts';
 import { useInternships } from '@/hooks/useInternships';
 import { useTrainingPrograms } from '@/hooks/useTrainingPrograms';
@@ -12,6 +12,17 @@ import { useContactMessages } from '@/hooks/useContactMessages';
 import { useTestimonials } from '@/hooks/useTestimonials';
 import { useServices } from '@/hooks/useServices';
 import { useJobs } from '@/hooks/useJobs';
+import { useProjects } from '@/hooks/useProjects';
+import { useAuth } from '@/hooks/useAuth';
+import { useAppDispatch } from '@/store/hooks';
+import { loadBlogPosts } from '@/store/slices/blogSlice';
+import { loadInternshipTracks, loadInternshipApplications } from '@/store/slices/internshipSlice';
+import { loadTrainingPrograms } from '@/store/slices/trainingSlice';
+import { loadEmployees } from '@/store/slices/employeeSlice';
+import { loadJobs, loadJobApplications } from '@/store/slices/jobSlice';
+import { loadServices } from '@/store/slices/serviceSlice';
+import { loadTestimonials } from '@/store/slices/testimonialSlice';
+import { loadContactMessages } from '@/store/slices/contactSlice';
 import { BlogPost } from '@/types/blog.types';
 import { InternshipTrack } from '@/types/internship.types';
 import { TrainingProgram } from '@/types/training.types';
@@ -19,7 +30,9 @@ import { Employee } from '@/types/employee.types';
 import { Testimonial } from '@/types/testimonial.types';
 import { Service } from '@/types/service.types';
 import { Job } from '@/types/job.types';
-import { Plus, Edit, Trash2, LogOut, ArrowLeft, AlertCircle, Layout, Briefcase, BookOpen, Users, FileText, Mail, Phone, Calendar, CheckCircle, XCircle, Clock, UserCircle, MessageSquare, Eye, Reply, Star, Settings } from 'lucide-react';
+import { Project } from '@/types/common.types';
+import { Plus, Edit, Trash2, LogOut, ArrowLeft, AlertCircle, Layout, Briefcase, BookOpen, Users, FileText, Mail, Phone, Calendar, CheckCircle, XCircle, Clock, UserCircle, MessageSquare, Eye, Reply, Star, Settings, FolderOpen, Lock, LogIn } from 'lucide-react';
+import { Loading, Input, Button } from '@/components/ui';
 import logo from '@/assets/logo.png';
 import styles from './AdminPage.module.css';
 
@@ -27,12 +40,17 @@ interface AdminPageProps {
   onNavigate?: (page: Page) => void;
 }
 
-type AdminTab = 'blog' | 'internships' | 'training' | 'applications' | 'employees' | 'messages' | 'testimonials' | 'services' | 'jobs';
+type AdminTab = 'blog' | 'internships' | 'training' | 'applications' | 'employees' | 'messages' | 'testimonials' | 'services' | 'jobs' | 'projects';
 
-type EditableData = BlogPost | InternshipTrack | TrainingProgram | Employee | Testimonial | Service | Job | Partial<BlogPost> | Partial<InternshipTrack> | Partial<TrainingProgram> | Partial<Employee> | Partial<Testimonial> | Partial<Service> | Partial<Job>;
+type EditableData = BlogPost | InternshipTrack | TrainingProgram | Employee | Testimonial | Service | Job | Project | Partial<BlogPost> | Partial<InternshipTrack> | Partial<TrainingProgram> | Partial<Employee> | Partial<Testimonial> | Partial<Service> | Partial<Job> | Partial<Project>;
 
 export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  
+  // All hooks must be called unconditionally and in the same order
+  // This is required by React's Rules of Hooks
+  const { isAuthenticated, isAdmin, isLoading, logout, adminLogin, error: authError } = useAuth();
   const { posts, savePost, deletePost } = useBlogPosts();
   const { tracks: internships, saveTrack: saveInternship, deleteTrack: deleteInternship } = useInternships();
   const { programs, saveProgram, deleteProgram } = useTrainingPrograms();
@@ -43,35 +61,53 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
   const { testimonials, saveTestimonial, deleteTestimonial } = useTestimonials();
   const { services, saveService, deleteService } = useServices();
   const { jobs, saveJob, deleteJob } = useJobs();
+  const { projects, saveProject, deleteProject } = useProjects();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
+  // Safety checks to ensure arrays are never undefined
+  const safePosts = posts || [];
+  const safeInternships = internships || [];
+  const safePrograms = programs || [];
+  const safeEmployees = employees || [];
+  const safeTestimonials = testimonials || [];
+  const safeServices = services || [];
+  const safeJobs = jobs || [];
+  const safeProjects = projects || [];
+  const safeInternshipApplications = internshipApplications || [];
+  const safeJobApplications = jobApplications || [];
+  const safeContactMessages = contactMessages || [];
+
+  // Explicitly load all data when admin is authenticated and dashboard is visible
+  // This ensures data is always fresh when admin accesses the dashboard
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      // Force reload all data when admin dashboard is accessed
+      // The hooks already load data, but this ensures it happens immediately
+      dispatch(loadBlogPosts());
+      dispatch(loadInternshipTracks());
+      dispatch(loadTrainingPrograms());
+      dispatch(loadEmployees());
+      dispatch(loadJobs());
+      dispatch(loadServices());
+      dispatch(loadTestimonials());
+      dispatch(loadContactMessages());
+      dispatch(loadInternshipApplications());
+      dispatch(loadJobApplications());
+    }
+  }, [isAuthenticated, isAdmin, dispatch]);
+
   const [activeTab, setActiveTab] = useState<AdminTab>('blog');
   const [isEditing, setIsEditing] = useState(false);
   const [currentData, setCurrentData] = useState<EditableData | null>(null);
-  const [error, setError] = useState('');
+  
+  // Admin login form state
+  const [loginData, setLoginData] = useState({
+    email: '',
+    password: '',
+  });
+  const [loginError, setLoginError] = useState('');
 
-  const handleLogin = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!password.trim()) {
-      setError('Please enter your password.');
-      return;
-    }
-    // Simple mock authentication
-    if (password === 'admin123') {
-      setIsAuthenticated(true);
-      setError('');
-      setPassword('');
-    } else {
-      setError('Incorrect password. Please try again.');
-    }
-  }, [password]);
-
-  const handlePasswordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-    if (error) setError('');
-  }, [error]);
-
+  // All useCallback and useMemo hooks must be called BEFORE any conditional returns
+  // This is required by React's Rules of Hooks
   const handleTabChange = useCallback((tab: AdminTab) => {
     setActiveTab(tab);
     setIsEditing(false);
@@ -83,7 +119,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
     setIsEditing(true);
   }, []);
 
-  const handleDelete = useCallback((id: string, type: AdminTab) => {
+  const handleDelete = useCallback((id: string | undefined, type: AdminTab) => {
+    // Validate ID exists
+    if (!id) {
+      console.error('Cannot delete: ID is undefined');
+      return;
+    }
+
     if (window.confirm('Are you sure you want to delete this item?')) {
       switch (type) {
         case 'blog':
@@ -97,9 +139,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
           break;
         case 'applications':
           // Check if it's an internship or job application
-          if (internshipApplications.some(app => app.id === id)) {
+          if (safeInternshipApplications.some(app => app.id === id)) {
             deleteInternshipApplication(id);
-          } else if (jobApplications.some(app => app.id === id)) {
+          } else if (safeJobApplications.some(app => app.id === id)) {
             deleteJobApplication(id);
           }
           break;
@@ -118,18 +160,21 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
         case 'jobs':
           deleteJob(id);
           break;
+        case 'projects':
+          deleteProject(id);
+          break;
       }
     }
-  }, [deletePost, deleteInternship, deleteProgram, deleteInternshipApplication, deleteJobApplication, deleteEmployee, deleteMessage, deleteTestimonial, deleteService, deleteJob, internshipApplications, jobApplications]);
+  }, [deletePost, deleteInternship, deleteProgram, deleteInternshipApplication, deleteJobApplication, deleteEmployee, deleteMessage, deleteTestimonial, deleteService, deleteJob, deleteProject, safeInternshipApplications, safeJobApplications]);
 
   const handleUpdateApplicationStatus = useCallback((id: string, status: 'Approved' | 'Rejected') => {
     // Check if it's an internship or job application
-    if (internshipApplications.some(app => app.id === id)) {
+    if (safeInternshipApplications.some(app => app.id === id)) {
       updateInternshipApplicationStatus(id, status);
-    } else if (jobApplications.some(app => app.id === id)) {
+    } else if (safeJobApplications.some(app => app.id === id)) {
       updateJobApplicationStatus(id, status);
     }
-  }, [internshipApplications, jobApplications, updateInternshipApplicationStatus, updateJobApplicationStatus]);
+  }, [safeInternshipApplications, safeJobApplications, updateInternshipApplicationStatus, updateJobApplicationStatus]);
 
   const handleCreatePost = useCallback(() => {
     setCurrentData({
@@ -216,6 +261,18 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
     setIsEditing(true);
   }, []);
 
+  const handleCreateProject = useCallback(() => {
+    setCurrentData({
+      id: Date.now().toString(),
+      title: '',
+      category: 'Web' as const,
+      description: '',
+      techStack: [],
+      image: ''
+    });
+    setIsEditing(true);
+  }, []);
+
   const handleSave = useCallback((data: EditableData) => {
     switch (activeTab) {
       case 'blog':
@@ -239,10 +296,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
       case 'jobs':
         saveJob(data as Job);
         break;
+      case 'projects':
+        saveProject(data as Project);
+        break;
     }
     setIsEditing(false);
     setCurrentData(null);
-  }, [activeTab, savePost, saveInternship, saveProgram, saveEmployee, saveTestimonial, saveService, saveJob]);
+  }, [activeTab, savePost, saveInternship, saveProgram, saveEmployee, saveTestimonial, saveService, saveJob, saveProject]);
 
   const handleCancel = useCallback(() => {
     setIsEditing(false);
@@ -250,13 +310,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
   }, []);
 
   const handleLogout = useCallback(() => {
-    setIsAuthenticated(false);
-    setPassword('');
-    setActiveTab('blog');
-    setIsEditing(false);
-    setCurrentData(null);
-    setError('');
-  }, []);
+    logout();
+    // logout action will handle redirect to home
+  }, [logout]);
 
   const handleBackToWebsite = useCallback(() => {
     // Use React Router navigation if available, otherwise fall back to prop callback
@@ -271,27 +327,29 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
   const isEmpty = useMemo(() => {
     switch (activeTab) {
       case 'blog':
-        return posts.length === 0;
+        return safePosts.length === 0;
       case 'internships':
-        return internships.length === 0;
+        return safeInternships.length === 0;
       case 'training':
-        return programs.length === 0;
+        return safePrograms.length === 0;
       case 'employees':
-        return employees.length === 0;
+        return safeEmployees.length === 0;
       case 'applications':
-        return internshipApplications.length === 0 && jobApplications.length === 0;
+        return safeInternshipApplications.length === 0 && safeJobApplications.length === 0;
       case 'messages':
-        return contactMessages.length === 0;
+        return safeContactMessages.length === 0;
       case 'testimonials':
-        return testimonials.length === 0;
+        return safeTestimonials.length === 0;
       case 'services':
-        return services.length === 0;
+        return safeServices.length === 0;
       case 'jobs':
-        return jobs.length === 0;
+        return safeJobs.length === 0;
+      case 'projects':
+        return safeProjects.length === 0;
       default:
         return false;
     }
-  }, [activeTab, posts.length, internships.length, programs.length, employees.length, internshipApplications.length, jobApplications.length, contactMessages.length, testimonials.length, services.length, jobs.length]);
+  }, [activeTab, safePosts.length, safeInternships.length, safePrograms.length, safeEmployees.length, safeInternshipApplications.length, safeJobApplications.length, safeContactMessages.length, safeTestimonials.length, safeServices.length, safeJobs.length, safeProjects.length]);
 
   const tableColSpan = useMemo(() => {
     return (activeTab === 'applications' || activeTab === 'messages') ? 4 : 3;
@@ -323,6 +381,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
         return 'All Services';
       case 'jobs':
         return 'Open Positions';
+      case 'projects':
+        return 'All Projects';
       default:
         return '';
     }
@@ -344,53 +404,120 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
         return handleCreateService;
       case 'jobs':
         return handleCreateJob;
+      case 'projects':
+        return handleCreateProject;
       default:
         return undefined;
     }
-  }, [activeTab, handleCreatePost, handleCreateTrack, handleCreateProgram, handleCreateEmployee, handleCreateTestimonial, handleCreateService, handleCreateJob]);
+  }, [activeTab, handleCreatePost, handleCreateTrack, handleCreateProgram, handleCreateEmployee, handleCreateTestimonial, handleCreateService, handleCreateJob, handleCreateProject]);
 
-  if (!isAuthenticated) {
+  // Show loading while checking authentication
+  // This must come AFTER all hooks are called (Rules of Hooks)
+  if (isLoading) {
+    return <Loading text="Loading..." fullScreen />;
+  }
+
+  // Check if student is trying to access admin page
+  const isStudentTryingToAccess = isAuthenticated && !isAdmin;
+
+  // Show admin login page if not authenticated or not admin
+  if (!isAuthenticated || !isAdmin) {
+    const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      setLoginData(prev => ({ ...prev, [name]: value }));
+      if (loginError) setLoginError('');
+    };
+
+    const handleAdminLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setLoginError('');
+
+      if (!loginData.email.trim() || !loginData.password.trim()) {
+        setLoginError('Please enter both email and password.');
+        return;
+      }
+
+      // Admin login endpoint handles role validation on backend
+
+      try {
+        await adminLogin({
+          email: loginData.email.trim(),
+          password: loginData.password,
+        });
+        // After successful login, the component will re-render
+        // If user is admin, dashboard will show
+        // If user is not admin (student), login form will show again with access denied message
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Login failed. Please check your credentials.';
+        setLoginError(message);
+      }
+    };
+
     return (
       <div className={styles.loginPage}>
         <div className={styles.loginCard}>
-          
           <div className={styles.loginHeader}>
             <div className={styles.logoContainer}>
               <img src={logo} alt="IMTDA Logo" className={styles.logo} />
             </div>
             <h2 className={styles.loginTitle}>Admin Login</h2>
-            <p className={styles.loginSubtitle}>Enter credentials to access dashboard</p>
+            <p className={styles.loginSubtitle}>Enter your credentials to access the admin dashboard</p>
           </div>
-          <form onSubmit={handleLogin} className={styles.loginForm}>
-            <div>
-              <label htmlFor="admin-password" className={styles.label}>
-                Password
-              </label>
-              <input 
-                id="admin-password"
-                type="password" 
-                className={`${styles.input} ${error ? styles.inputError : ''}`}
-                value={password}
-                onChange={handlePasswordChange}
-                placeholder="Enter password (admin123)"
-                aria-invalid={!!error}
-                aria-describedby={error ? 'password-error' : undefined}
-              />
+          
+          {isStudentTryingToAccess && (
+            <div className={styles.errorMessage} role="alert" style={{ marginBottom: '1rem' }}>
+              <AlertCircle size={16} className={styles.errorIcon} aria-hidden="true" />
+              <span>Access denied. This page is only accessible to administrators.</span>
             </div>
-            {error && (
-              <div id="password-error" className={styles.errorMessage} role="alert">
+          )}
+          
+          <form onSubmit={handleAdminLogin} className={styles.loginForm}>
+            <Input
+              label="Email Address"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              leftIcon={<Mail className="h-5 w-5 text-gray-400" />}
+              placeholder="admin@imtda.com"
+              value={loginData.email}
+              onChange={handleLoginChange}
+              error={loginError && !loginData.email ? loginError : undefined}
+            />
+
+             <Input
+               label="Password"
+               name="password"
+               type="password"
+               autoComplete="current-password"
+               required
+               leftIcon={<Lock className="h-5 w-5 text-gray-400" />}
+               placeholder="Enter your password"
+               value={loginData.password}
+               onChange={handleLoginChange}
+               error={loginError && loginData.email ? loginError : undefined}
+             />
+
+            {(loginError || authError) && (
+              <div className={styles.errorMessage} role="alert">
                 <AlertCircle size={16} className={styles.errorIcon} aria-hidden="true" />
-                <span>{error}</span>
+                <span>{loginError || authError}</span>
               </div>
             )}
-            <button type="submit" className={styles.loginButton}>
-              Login
-            </button>
+
+            <Button
+              type="submit"
+              fullWidth
+              isLoading={isLoading}
+              rightIcon={<LogIn className="w-4 h-4" />}
+            >
+              Sign In to Admin Dashboard
+            </Button>
           </form>
 
           <div className={styles.loginFooter}>
             <button 
-              onClick={handleBackToWebsite}
+              onClick={() => navigate('/', { replace: true })}
               className={styles.backButton}
               type="button"
             >
@@ -402,6 +529,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
     );
   }
 
+  // All hooks are already defined above, before the conditional returns
+  // Dashboard JSX starts here
   return (
     <div className={styles.dashboardContainer}>
       {/* Sidebar */}
@@ -481,6 +610,14 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
             aria-current={activeTab === 'jobs' ? 'page' : undefined}
           >
             <Briefcase size={20} aria-hidden="true" /> <span>Open Positions</span>
+          </button>
+          <button 
+            onClick={() => handleTabChange('projects')}
+            className={`${styles.sidebarButton} ${activeTab === 'projects' ? styles.sidebarButtonActive : ''}`}
+            type="button"
+            aria-current={activeTab === 'projects' ? 'page' : undefined}
+          >
+            <FolderOpen size={20} aria-hidden="true" /> <span>Projects</span>
           </button>
         </nav>
         <div className={styles.sidebarFooter}>
@@ -602,6 +739,15 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
            >
              Jobs
            </button>
+           <button 
+             onClick={() => handleTabChange('projects')} 
+             className={`${styles.mobileTab} ${activeTab === 'projects' ? styles.mobileTabActive : ''}`}
+             type="button"
+             role="tab"
+             aria-selected={activeTab === 'projects'}
+           >
+             Projects
+           </button>
         </div>
 
         {isEditing && currentData ? (
@@ -613,6 +759,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
              {activeTab === 'testimonials' && <TestimonialForm initialData={currentData as Partial<Testimonial>} onSave={handleSave} onCancel={handleCancel} />}
              {activeTab === 'services' && <ServiceForm initialData={currentData as Partial<Service>} onSave={handleSave} onCancel={handleCancel} />}
              {activeTab === 'jobs' && <JobForm initialData={currentData as Partial<Job>} onSave={handleSave} onCancel={handleCancel} />}
+             {activeTab === 'projects' && <ProjectForm initialData={currentData as Partial<Project>} onSave={handleSave} onCancel={handleCancel} />}
           </div>
         ) : (
           <div className={styles.contentCard}>
@@ -641,7 +788,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                        activeTab === 'employees' ? 'Name' :
                        activeTab === 'testimonials' ? 'Name' :
                        activeTab === 'services' ? 'Title' :
-                       activeTab === 'jobs' ? 'Position' : 'Title'}
+                       activeTab === 'jobs' ? 'Position' :
+                       activeTab === 'projects' ? 'Project' : 'Title'}
                     </th>
                     <th className={styles.tableHeaderCell}>
                        {activeTab === 'applications' ? 'Details' : 
@@ -649,7 +797,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                         activeTab === 'employees' ? 'Role & Skills' :
                         activeTab === 'testimonials' ? 'Title & Quote' :
                         activeTab === 'services' ? 'Description & Features' :
-                        activeTab === 'jobs' ? 'Department, Type & Location' : 'Info'}
+                        activeTab === 'jobs' ? 'Department, Type & Location' :
+                        activeTab === 'projects' ? 'Category & Tech Stack' : 'Info'}
                     </th>
                     {(activeTab === 'applications' || activeTab === 'messages') && (
                       <th className={styles.tableHeaderCell}>
@@ -660,7 +809,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                   </tr>
                 </thead>
                 <tbody className={styles.tableBody}>
-                  {activeTab === 'blog' && posts.map(post => (
+                  {activeTab === 'blog' && safePosts.filter(post => post.id).map(post => (
                     <tr key={post.id} className={styles.tableRow}>
                       <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{post.title}</td>
                       <td className={styles.tableCell}><span className={`${styles.badge} ${styles.badgeBlue}`}>{post.category}</span></td>
@@ -686,7 +835,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                     </tr>
                   ))}
-                  {activeTab === 'internships' && internships.map(track => (
+                  {activeTab === 'internships' && safeInternships.filter(track => track.id).map(track => (
                     <tr key={track.id} className={styles.tableRow}>
                       <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{track.title}</td>
                       <td className={`${styles.tableCell} ${styles.tableCellSmall}`}>{track.duration} • {track.mode}</td>
@@ -698,7 +847,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                     </tr>
                   ))}
-                  {activeTab === 'training' && programs.map(program => (
+                  {activeTab === 'training' && safePrograms.filter(program => program.id).map(program => (
                     <tr key={program.id} className={styles.tableRow}>
                       <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{program.title}</td>
                       <td className={styles.tableCell}><span className={`${styles.badge} ${program.category === 'Institutional' ? styles.badgePurple : styles.badgeOrange}`}>{program.category}</span></td>
@@ -710,7 +859,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                     </tr>
                   ))}
-                  {activeTab === 'employees' && employees.map(employee => (
+                  {activeTab === 'employees' && safeEmployees.filter(employee => employee.id).map(employee => (
                     <tr key={employee.id} className={styles.tableRow}>
                       <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{employee.name}</td>
                       <td className={`${styles.tableCell} ${styles.tableCellSmall}`}>
@@ -729,7 +878,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                     </tr>
                   ))}
-                  {activeTab === 'testimonials' && testimonials.map(testimonial => (
+                  {activeTab === 'testimonials' && safeTestimonials.filter(testimonial => testimonial.id).map(testimonial => (
                     <tr key={testimonial.id} className={styles.tableRow}>
                       <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{testimonial.name}</td>
                       <td className={styles.tableCell}>
@@ -746,7 +895,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                     </tr>
                   ))}
-                  {activeTab === 'services' && services.map(service => (
+                  {activeTab === 'services' && safeServices.filter(service => service.id).map(service => (
                     <tr key={service.id} className={styles.tableRow}>
                       <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{service.title}</td>
                       <td className={styles.tableCell}>
@@ -770,7 +919,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                     </tr>
                   ))}
-                  {activeTab === 'jobs' && jobs.map(job => (
+                  {activeTab === 'jobs' && safeJobs.filter(job => job.id).map(job => (
                     <tr key={job.id} className={styles.tableRow}>
                       <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{job.title}</td>
                       <td className={styles.tableCell}>
@@ -788,10 +937,35 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                       </td>
                     </tr>
                   ))}
+                  {activeTab === 'projects' && safeProjects.filter(project => project.id).map(project => (
+                    <tr key={project.id} className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellMedium}`}>{project.title}</td>
+                      <td className={styles.tableCell}>
+                        <div className={styles.messagePreview} title={project.description}>
+                          {project.description.substring(0, 80)}{project.description.length > 80 ? '...' : ''}
+                        </div>
+                        <div className={styles.skillsContainer} style={{ marginTop: '0.5rem' }}>
+                          <span className={`${styles.badge} ${styles.badgeBlue}`}>{project.category}</span>
+                          {project.techStack.slice(0, 3).map((tech, idx) => (
+                            <span key={idx} className={`${styles.badge} ${styles.badgeBlue}`}>{tech}</span>
+                          ))}
+                          {project.techStack.length > 3 && (
+                            <span className={`${styles.badge} ${styles.badgeBlue}`}>+{project.techStack.length - 3} more</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className={`${styles.tableCell} ${styles.tableCellCenter}`}>
+                        <div className={styles.actionButtons}>
+                          <button onClick={() => handleEdit(project)} className={`${styles.actionButton} ${styles.editButton}`}><Edit size={18} /></button>
+                          <button onClick={() => handleDelete(project.id, 'projects')} className={`${styles.actionButton} ${styles.deleteButton}`}><Trash2 size={18} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
 
                   {/* Applications View - Internship Applications */}
-                  {activeTab === 'applications' && internshipApplications.length > 0 && internshipApplications.map(app => (
-                     <tr key={app.id} className={styles.tableRow}>
+                  {activeTab === 'applications' && safeInternshipApplications.filter(app => app.id).map(app => (
+                     <tr key={`internship-${app.id}`} className={styles.tableRow}>
                       <td className={styles.tableCell}>
                          <div className={styles.applicantName}>{app.name}</div>
                          <div className={styles.dateText}><Calendar size={12}/> {app.date}</div>
@@ -848,8 +1022,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                     </tr>
                   ))}
                   {/* Applications View - Job Applications */}
-                  {activeTab === 'applications' && jobApplications.length > 0 && jobApplications.map(app => (
-                     <tr key={app.id} className={styles.tableRow}>
+                  {activeTab === 'applications' && safeJobApplications.filter(app => app.id).map(app => (
+                     <tr key={`job-${app.id}`} className={styles.tableRow}>
                       <td className={styles.tableCell}>
                          <div className={styles.applicantName}>{app.name}</div>
                          <div className={styles.dateText}><Calendar size={12}/> {app.date}</div>
@@ -909,7 +1083,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                   ))}
 
                   {/* Contact Messages View */}
-                  {activeTab === 'messages' && contactMessages.map(msg => (
+                  {activeTab === 'messages' && safeContactMessages.filter(msg => msg.id).map(msg => (
                     <tr key={msg.id} className={`${styles.tableRow} ${msg.status === 'New' ? styles.tableRowNew : ''}`}>
                       <td className={styles.tableCell}>
                         <div className={styles.messageHeader}>
@@ -985,7 +1159,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigate }) => {
                   ))}
                   
                   {isEmpty && (
-                    <tr>
+                    <tr key="empty-state">
                       <td colSpan={tableColSpan} className={styles.emptyStateCell}>
                         {emptyStateMessage}
                       </td>

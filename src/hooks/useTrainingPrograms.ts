@@ -12,6 +12,7 @@ import {
   saveTrainingProgram,
   deleteTrainingProgram,
 } from '@/store/slices/trainingSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { TrainingProgram } from '@/types/training.types';
 
 /**
@@ -22,10 +23,13 @@ export const useTrainingPrograms = () => {
   const dispatch = useAppDispatch();
   const programs = useAppSelector(selectTrainingPrograms);
   const loading = useAppSelector(selectTrainingLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadTrainingPrograms());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadTrainingPrograms());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     programs,

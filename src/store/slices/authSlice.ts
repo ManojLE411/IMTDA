@@ -8,6 +8,7 @@ import { User, UserRole, LoginCredentials, RegisterData, AuthToken } from '@/typ
 import { StorageService } from '@/services/storage';
 import { authService } from '@/services/authService';
 import { apiClient } from '@/services/apiClient';
+import { authApi } from '@/services/authApi';
 import { STORAGE_KEYS } from '@/constants/storage-keys';
 import { AUTH_CONFIG } from '@/config';
 
@@ -42,12 +43,20 @@ export const initializeAuth = createAsyncThunk('auth/initialize', async () => {
 
       // Optionally refresh user data
       try {
-        const freshUser = await authService.getCurrentUser(storedToken.accessToken);
+        const freshUser = await authApi.getCurrentUser();
         if (freshUser) {
           StorageService.set(STORAGE_KEYS.AUTH_USER, freshUser);
           return { user: freshUser, token: storedToken };
         }
-      } catch (error) {
+      } catch (error: any) {
+        // Silently handle 401 errors (token expired/invalid) - this is expected
+        if (error?.status === 401 || error?.response?.status === 401) {
+          // Token is invalid, clear auth
+          StorageService.remove(STORAGE_KEYS.AUTH_TOKEN);
+          StorageService.remove(STORAGE_KEYS.AUTH_USER);
+          return null;
+        }
+        // Only log non-401 errors
         console.warn('Failed to refresh user data:', error);
       }
 
@@ -62,13 +71,13 @@ export const initializeAuth = createAsyncThunk('auth/initialize', async () => {
 });
 
 /**
- * Login user
+ * Login user (student)
  */
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const response = await authService.login(credentials);
+      const response = await authApi.login(credentials);
       const { user, token } = response;
 
       // Store in localStorage
@@ -87,13 +96,38 @@ export const loginUser = createAsyncThunk(
 );
 
 /**
- * Register new user
+ * Admin login
+ */
+export const adminLogin = createAsyncThunk(
+  'auth/adminLogin',
+  async (credentials: LoginCredentials, { rejectWithValue }) => {
+    try {
+      const response = await authApi.adminLogin(credentials);
+      const { user, token } = response;
+
+      // Store in localStorage
+      StorageService.set(STORAGE_KEYS.AUTH_TOKEN, token);
+      StorageService.set(STORAGE_KEYS.AUTH_USER, user);
+      StorageService.set(STORAGE_KEYS.CURRENT_USER, user); // Legacy support
+
+      // Set token in API client
+      apiClient.setToken(token.accessToken, token.expiresAt);
+
+      return { user, token };
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Admin login failed');
+    }
+  }
+);
+
+/**
+ * Register new user (student)
  */
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (data: RegisterData, { rejectWithValue }) => {
     try {
-      const response = await authService.register(data);
+      const response = await authApi.register(data);
       const { user, token } = response;
 
       // Store in localStorage
@@ -124,17 +158,17 @@ export const refreshUser = createAsyncThunk(
       return rejectWithValue('No token available');
     }
 
-    try {
-      const freshUser = await authService.getCurrentUser(token.accessToken);
-      if (freshUser) {
-        StorageService.set(STORAGE_KEYS.AUTH_USER, freshUser);
-        StorageService.set(STORAGE_KEYS.CURRENT_USER, freshUser); // Legacy
-        return freshUser;
+      try {
+        const freshUser = await authApi.getCurrentUser();
+        if (freshUser) {
+          StorageService.set(STORAGE_KEYS.AUTH_USER, freshUser);
+          StorageService.set(STORAGE_KEYS.CURRENT_USER, freshUser); // Legacy
+          return freshUser;
+        }
+        return rejectWithValue('Failed to refresh user');
+      } catch (error) {
+        return rejectWithValue(error instanceof Error ? error.message : 'Failed to refresh user');
       }
-      return rejectWithValue('Failed to refresh user');
-    } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : 'Failed to refresh user');
-    }
   }
 );
 
@@ -152,7 +186,7 @@ export const updateUser = createAsyncThunk(
     }
 
     try {
-      const updatedUser = await authService.updateUser(user.id, updates);
+      const updatedUser = await authApi.updateProfile(updates);
       StorageService.set(STORAGE_KEYS.AUTH_USER, updatedUser);
       StorageService.set(STORAGE_KEYS.CURRENT_USER, updatedUser); // Legacy
       return updatedUser;
@@ -242,6 +276,25 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+      })
+      // Admin login
+      .addCase(adminLogin.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(adminLogin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(adminLogin.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
         state.user = null;

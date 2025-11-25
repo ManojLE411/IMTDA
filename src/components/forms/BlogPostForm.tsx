@@ -13,6 +13,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave,
     title: '',
     category: '',
     author: '',
+    date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
     image: '',
     excerpt: '',
     content: '',
@@ -24,6 +25,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave,
       title: '',
       category: '',
       author: '',
+      date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
       image: '',
       excerpt: '',
       content: '',
@@ -90,7 +92,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave,
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Author *</label>
             <input
               type="text"
               name="author"
@@ -100,6 +102,19 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData, onSave,
               onChange={handleChange}
               placeholder="Author name"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+            <input
+              type="text"
+              name="date"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              value={formData.date || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              onChange={handleChange}
+              placeholder="e.g., Jan 15, 2024"
+            />
+            <p className="text-xs text-gray-500 mt-1">Format: Month Day, Year (e.g., Jan 15, 2024)</p>
           </div>
         </div>
 

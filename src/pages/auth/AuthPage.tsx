@@ -130,6 +130,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
         // Navigation will be handled by useEffect when isAuthenticated becomes true
         // The useEffect watches isAuthenticated, user, and isLoading changes
       } else {
+        // Prevent admin login on student login page
+        if (formData.email.trim().toLowerCase() === 'admin@imtda.com') {
+          setError('Admin accounts cannot log in here. Please use the admin login page at /admin');
+          return;
+        }
+        
         // Login and redirect based on role
         await login({
           email: formData.email,
@@ -137,7 +143,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
         });
         
         // Redirect immediately after login completes
-        // Check email directly to determine admin vs student
         const state = location.state as LocationState | null;
         const from = state?.from?.pathname;
         
@@ -145,13 +150,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
         if (from) {
           navigate(from, { replace: true });
         } else {
-          // Check email to determine admin - admin@imtda.com goes to /admin
-          // The user state might not be updated yet, so check email directly
-          if (formData.email === 'admin@imtda.com') {
-            navigate('/admin', { replace: true });
-          } else {
-            navigate('/dashboard', { replace: true });
-          }
+          // Students always go to dashboard
+          navigate('/dashboard', { replace: true });
         }
       }
     } catch (err: unknown) {

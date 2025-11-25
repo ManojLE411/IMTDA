@@ -245,13 +245,11 @@ const router = createBrowserRouter([
   {
     path: '/admin',
     element: (
-      <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
-        <ErrorBoundary>
-          <Suspense fallback={<LoadingFallback />}>
-            <AdminPage />
-          </Suspense>
-        </ErrorBoundary>
-      </ProtectedRoute>
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <AdminPage />
+        </Suspense>
+      </ErrorBoundary>
     ),
     errorElement: <ErrorPage />,
   },

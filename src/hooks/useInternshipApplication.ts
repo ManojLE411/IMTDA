@@ -13,6 +13,7 @@ import {
   deleteInternshipApplication,
   updateInternshipApplicationStatus,
 } from '@/store/slices/internshipSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { InternshipApplication } from '@/types/internship.types';
 
 /**
@@ -23,16 +24,19 @@ export const useInternshipApplication = () => {
   const dispatch = useAppDispatch();
   const applications = useAppSelector(selectInternshipApplications) || [];
   const loading = useAppSelector(selectApplicationsLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadInternshipApplications());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadInternshipApplications());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     applications,
     loading,
-    applyForInternship: (application: InternshipApplication) => {
-      dispatch(applyForInternship(application));
+    applyForInternship: (application: InternshipApplication, resumeFile?: File) => {
+      dispatch(applyForInternship({ application, resumeFile }));
     },
     deleteApplication: (id: string) => {
       dispatch(deleteInternshipApplication(id));

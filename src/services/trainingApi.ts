@@ -13,20 +13,48 @@ class TrainingApiService {
    * Get all training programs
    */
   async getAll(): Promise<TrainingProgram[]> {
-    const response = await apiClient.get<ApiResponse<TrainingProgram[]>>(
-      API_ENDPOINTS.TRAINING.LIST
-    );
-    return response.data;
+    try {
+      const response = await apiClient.get<ApiResponse<TrainingProgram[]>>(
+        API_ENDPOINTS.TRAINING.LIST
+      );
+      // Ensure response.data is an array
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      console.warn('Training API response format unexpected:', response);
+      return [];
+    } catch (error) {
+      console.error('Error fetching training programs:', error);
+      throw error;
+    }
   }
 
   /**
    * Get paginated training programs
    */
   async getPaginated(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<TrainingProgram>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<TrainingProgram>>>(
+    const response = await apiClient.get<ApiResponse<TrainingProgram[]> & { pagination?: any }>(
       `${API_ENDPOINTS.TRAINING.LIST}?page=${page}&pageSize=${pageSize}`
     );
-    return response.data;
+    // Backend returns { data: T[], pagination: {...} }
+    // Frontend expects { data: T[], total, page, pageSize, totalPages }
+    if (response.pagination) {
+      return {
+        data: response.data,
+        total: response.pagination.total,
+        page: response.pagination.page,
+        pageSize: response.pagination.pageSize,
+        totalPages: response.pagination.totalPages,
+      };
+    }
+    // Fallback if no pagination info
+    return {
+      data: response.data,
+      total: response.data.length,
+      page,
+      pageSize,
+      totalPages: 1,
+    };
   }
 
   /**

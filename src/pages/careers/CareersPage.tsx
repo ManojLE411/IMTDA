@@ -22,15 +22,7 @@ export const CareersPage: React.FC = () => {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  // Fallback jobs if none exist in storage
-  const fallbackJobs = [
-    { id: '1', title: 'AI Research Engineer', department: 'R&D', type: 'Full-time' as const, location: 'Remote' as const },
-    { id: '2', title: 'Frontend Developer (React)', department: 'Engineering', type: 'Full-time' as const, location: 'On-site' as const },
-    { id: '3', title: 'Technical Trainer (VLSI)', department: 'Education', type: 'Contract' as const, location: 'Hybrid' as const },
-    { id: '4', title: 'Business Development Executive', department: 'Sales', type: 'Full-time' as const, location: 'On-site' as const },
-  ];
-
-  const displayJobs = jobs.length > 0 ? jobs : fallbackJobs;
+  const displayJobs = jobs || [];
 
   // Prefill form if user is logged in
   useEffect(() => {
@@ -76,6 +68,18 @@ export const CareersPage: React.FC = () => {
     e.preventDefault();
     if (!selectedJob) return;
     
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.phone) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    
+    // Validate resume file
+    if (!formData.resume) {
+      alert('Please upload your resume.');
+      return;
+    }
+    
     const newApplication = {
       id: Date.now().toString(),
       jobId: selectedJob.id,
@@ -83,14 +87,13 @@ export const CareersPage: React.FC = () => {
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
-      resumeName: formData.resume ? formData.resume.name : 'No file uploaded',
       coverLetter: formData.coverLetter,
       date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
       status: 'Pending' as const,
       userId: currentUser?.id
     };
 
-    applyForJob(newApplication);
+    applyForJob(newApplication, formData.resume);
     setSubmitted(true);
     
     // Reset after delay

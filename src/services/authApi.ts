@@ -76,6 +76,28 @@ class AuthApiService {
       console.warn('Logout request failed, clearing local auth:', error);
     }
   }
+
+  /**
+   * Admin login
+   */
+  async adminLogin(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await apiClient.post<ApiResponse<AuthResponse>>(
+      API_ENDPOINTS.AUTH.ADMIN_LOGIN,
+      credentials
+    );
+    return response.data;
+  }
+
+  /**
+   * Admin register
+   */
+  async adminRegister(data: RegisterData): Promise<AuthResponse> {
+    const response = await apiClient.post<ApiResponse<AuthResponse>>(
+      API_ENDPOINTS.AUTH.ADMIN_REGISTER,
+      data
+    );
+    return response.data;
+  }
 }
 
 export const authApi = new AuthApiService();

@@ -14,6 +14,7 @@ import {
   selectIsStudent,
   selectAuthError,
   loginUser,
+  adminLogin,
   registerUser,
   logout,
   refreshUser,
@@ -49,6 +50,9 @@ export const useAuth = () => {
     // Actions
     login: async (credentials: LoginCredentials) => {
       await dispatch(loginUser(credentials)).unwrap();
+    },
+    adminLogin: async (credentials: LoginCredentials) => {
+      await dispatch(adminLogin(credentials)).unwrap();
     },
     register: async (data: RegisterData) => {
       await dispatch(registerUser(data)).unwrap();

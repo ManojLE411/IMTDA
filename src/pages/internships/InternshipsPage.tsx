@@ -281,47 +281,7 @@ export const InternshipsPage: React.FC = () => {
   const { applyForInternship } = useInternshipApplication();
   const { user: currentUser } = useAuth();
 
-  // Fallback/preset tracks if none exist in storage
-  const fallbackTracks = [
-    {
-      id: '1',
-      title: 'Full Stack Web Development',
-      description: 'Build scalable web applications from scratch using the MERN stack.',
-      duration: '2 Months',
-      mode: 'Hybrid' as const,
-      skills: ['React', 'Node.js', 'MongoDB', 'Tailwind'],
-      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80'
-    },
-    {
-      id: '2',
-      title: 'AI & Machine Learning',
-      description: 'Dive deep into neural networks, predictive modeling, and data analysis.',
-      duration: '2 Months',
-      mode: 'Online' as const,
-      skills: ['Python', 'TensorFlow', 'Pandas', 'Scikit-Learn'],
-      image: 'https://images.unsplash.com/photo-1555255707-c07966088b7b?w=400&q=80'
-    },
-    {
-      id: '3',
-      title: 'VLSI Design & Verification',
-      description: 'Master the art of chip design and verification methodologies.',
-      duration: '3 Months',
-      mode: 'Offline' as const,
-      skills: ['Verilog', 'SystemVerilog', 'UVM', 'RTL Design'],
-      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80'
-    },
-    {
-      id: '4',
-      title: 'AutoCAD & Mechanical Design',
-      description: 'Industrial standard training for mechanical design and simulations.',
-      duration: '1 Month',
-      mode: 'Offline' as const,
-      skills: ['AutoCAD', 'CATIA', 'ANSYS', '3D Modeling'],
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&q=80'
-    },
-  ];
-
-  const displayTracks = tracks.length > 0 ? tracks : fallbackTracks;
+  const displayTracks = tracks || [];
 
   const [selectedTrackDetail, setSelectedTrackDetail] = useState<InternshipTrack | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<string>('');
@@ -361,20 +321,39 @@ export const InternshipsPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.phone || !selectedTrack || !formData.message) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    
+    // Validate resume file
+    if (!formData.resume) {
+      alert('Please upload your resume.');
+      return;
+    }
+    
+    // Find the internship track ID
+    const selectedTrackObj = displayTracks.find(t => t.title === selectedTrack);
+    if (!selectedTrackObj) {
+      alert('Please select a valid internship track.');
+      return;
+    }
+    
     const newApplication = {
       id: Date.now().toString(),
+      internshipId: selectedTrackObj.id,
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
       course: selectedTrack,
-      resumeName: formData.resume ? formData.resume.name : 'No file uploaded',
       message: formData.message,
       date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
       status: 'Pending' as const,
       studentId: currentUser?.id
     };
 
-    applyForInternship(newApplication);
+    applyForInternship(newApplication, formData.resume);
     setSubmitted(true);
     
     // Reset after delay

@@ -14,6 +14,7 @@ import {
   markMessageAsRead,
   markMessageAsReplied,
 } from '@/store/slices/contactSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { ContactMessage } from '@/types/contact.types';
 
 /**
@@ -24,10 +25,13 @@ export const useContactMessages = () => {
   const dispatch = useAppDispatch();
   const messages = useAppSelector(selectContactMessages);
   const loading = useAppSelector(selectContactLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadContactMessages());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadContactMessages());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     messages,

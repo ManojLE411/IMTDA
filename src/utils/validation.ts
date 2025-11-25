@@ -6,6 +6,18 @@
 import { z } from 'zod';
 
 /**
+ * Check if a string is a valid MongoDB ObjectId
+ * MongoDB ObjectIds are 24-character hexadecimal strings
+ */
+export function isValidObjectId(id: string): boolean {
+  if (!id || typeof id !== 'string') {
+    return false;
+  }
+  // MongoDB ObjectId is exactly 24 hex characters
+  return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
+/**
  * Login form schema
  */
 export const loginSchema = z.object({

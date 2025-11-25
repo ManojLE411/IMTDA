@@ -34,10 +34,28 @@ class ContactApiService {
    * Get paginated contact messages
    */
   async getPaginated(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<ContactMessage>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<ContactMessage>>>(
+    const response = await apiClient.get<ApiResponse<ContactMessage[]> & { pagination?: any }>(
       `${API_ENDPOINTS.CONTACT.LIST}?page=${page}&pageSize=${pageSize}`
     );
-    return response.data;
+    // Backend returns { data: T[], pagination: {...} }
+    // Frontend expects { data: T[], total, page, pageSize, totalPages }
+    if (response.pagination) {
+      return {
+        data: response.data,
+        total: response.pagination.total,
+        page: response.pagination.page,
+        pageSize: response.pagination.pageSize,
+        totalPages: response.pagination.totalPages,
+      };
+    }
+    // Fallback if no pagination info
+    return {
+      data: response.data,
+      total: response.data.length,
+      page,
+      pageSize,
+      totalPages: 1,
+    };
   }
 
   /**

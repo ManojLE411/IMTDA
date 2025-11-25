@@ -41,19 +41,7 @@ export const HomePage: React.FC = () => {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Fallback services if none exist in storage
-  const fallbackServices = [
-    { icon: 'Cpu', title: 'AI & Machine Learning', desc: 'Custom AI solutions, predictive analytics, and intelligent automation for your business.' },
-    { icon: 'Code', title: 'Custom Software Development', desc: 'Scalable web and enterprise applications built with modern technologies.' },
-    { icon: 'Database', title: 'Data Engineering & Analytics', desc: 'Transform data into insights with robust pipelines and BI solutions.' },
-    { icon: 'Video', title: 'Computer Vision Solutions', desc: 'Advanced video analytics, image processing, and smart surveillance systems.' },
-    { icon: 'PenTool', title: 'Cloud & DevOps', desc: 'Scalable cloud infrastructure, CI/CD pipelines, and automated deployments.' },
-    { icon: 'BookOpen', title: 'Training & Upskilling', desc: 'Professional training programs to upskill your team in cutting-edge technologies.' },
-  ];
-
-  const displayServices = services.length > 0 
-    ? services.slice(0, 6).map(s => ({ icon: s.icon, title: s.title, desc: s.description }))
-    : fallbackServices;
+  const displayServices = (services || []).slice(0, 6).map(s => ({ icon: s.icon, title: s.title, desc: s.description }));
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -248,76 +236,28 @@ export const HomePage: React.FC = () => {
         </div>
         <div className={styles.testimonialsContainer}>
            <div className={styles.testimonialsScroll}>
-              {testimonials.length > 0 ? (
-                testimonials.map((testimonial, idx) => (
-                  <div
-                    key={testimonial.id}
-                    className={`${styles.testimonialCard} ${
-                      visibleSections.has('testimonials') ? '' : styles.testimonialCardHidden
-                    }`}
-                    style={{ transitionDelay: `${idx * 100}ms` }}
-                  >
-                    <div className={styles.testimonialHeader}>
-                      <img
-                        src={testimonial.avatar || `https://picsum.photos/50/50?random=${100 + idx}`}
-                        alt={`${testimonial.name} avatar`}
-                        className={styles.testimonialAvatar}
-                      />
-                      <div className={styles.testimonialInfo}>
-                        <div className={styles.testimonialName}>{testimonial.name}</div>
-                        <div className={styles.testimonialTitle}>{testimonial.title}</div>
-                      </div>
+              {(testimonials || []).map((testimonial, idx) => (
+                <div
+                  key={testimonial.id}
+                  className={`${styles.testimonialCard} ${
+                    visibleSections.has('testimonials') ? '' : styles.testimonialCardHidden
+                  }`}
+                  style={{ transitionDelay: `${idx * 100}ms` }}
+                >
+                  <div className={styles.testimonialHeader}>
+                    <img
+                      src={testimonial.avatar || `https://picsum.photos/50/50?random=${100 + idx}`}
+                      alt={`${testimonial.name} avatar`}
+                      className={styles.testimonialAvatar}
+                    />
+                    <div className={styles.testimonialInfo}>
+                      <div className={styles.testimonialName}>{testimonial.name}</div>
+                      <div className={styles.testimonialTitle}>{testimonial.title}</div>
                     </div>
-                    <p className={styles.testimonialQuote}>{testimonial.quote}</p>
                   </div>
-                ))
-              ) : (
-                // Fallback testimonials if none exist in storage
-                [
-                  {
-                    id: '1',
-                    name: 'Rajesh Kumar',
-                    title: 'CTO, TechCorp Solutions',
-                    quote:
-                      "IMTDA delivered an exceptional AI-powered analytics platform for our business. Their team's expertise and professionalism exceeded our expectations. The solution has significantly improved our decision-making process.",
-                  },
-                  {
-                    id: '2',
-                    name: 'Sarah Johnson',
-                    title: 'Product Manager, InnovateLabs',
-                    quote:
-                      "Working with IMTDA on our custom software development project was seamless. They understood our requirements perfectly and delivered a scalable solution on time. Highly recommended!",
-                  },
-                  {
-                    id: '3',
-                    name: 'Michael Chen',
-                    title: 'Director, DataFlow Systems',
-                    quote:
-                      "IMTDA's data engineering team built us a robust ETL pipeline that processes millions of records daily. Their cloud infrastructure expertise helped us scale efficiently while reducing costs.",
-                  },
-                ].map((testimonial, idx) => (
-                  <div
-                    key={testimonial.id}
-                    className={`${styles.testimonialCard} ${
-                      visibleSections.has('testimonials') ? '' : styles.testimonialCardHidden
-                    }`}
-                    style={{ transitionDelay: `${idx * 100}ms` }}
-                  >
-                    <div className={styles.testimonialHeader}>
-                      <img
-                        src={`https://picsum.photos/50/50?random=${100 + idx}`}
-                        alt={`${testimonial.name} avatar`}
-                        className={styles.testimonialAvatar}
-                      />
-                      <div className={styles.testimonialInfo}>
-                        <div className={styles.testimonialName}>{testimonial.name}</div>
-                        <div className={styles.testimonialTitle}>{testimonial.title}</div>
-                      </div>
-                    </div>
-                    <p className={styles.testimonialQuote}>{testimonial.quote}</p>
-                  </div>
-                ))
-              )}
+                  <p className={styles.testimonialQuote}>{testimonial.quote}</p>
+                </div>
+              ))}
            </div>
         </div>
       </section>

@@ -12,6 +12,7 @@ import {
   saveInternshipTrack,
   deleteInternshipTrack,
 } from '@/store/slices/internshipSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { InternshipTrack } from '@/types/internship.types';
 
 /**
@@ -22,10 +23,13 @@ export const useInternships = () => {
   const dispatch = useAppDispatch();
   const tracks = useAppSelector(selectInternshipTracks);
   const loading = useAppSelector(selectInternshipLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadInternshipTracks());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadInternshipTracks());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     tracks,

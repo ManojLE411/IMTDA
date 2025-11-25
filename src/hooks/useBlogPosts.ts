@@ -12,6 +12,7 @@ import {
   saveBlogPost,
   deleteBlogPost,
 } from '@/store/slices/blogSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { BlogPost } from '@/types/blog.types';
 
 /**
@@ -22,10 +23,13 @@ export const useBlogPosts = () => {
   const dispatch = useAppDispatch();
   const posts = useAppSelector(selectBlogPosts);
   const loading = useAppSelector(selectBlogLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadBlogPosts());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadBlogPosts());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     posts,

@@ -12,6 +12,7 @@ import {
   saveEmployee,
   deleteEmployee,
 } from '@/store/slices/employeeSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { Employee } from '@/types/employee.types';
 
 /**
@@ -22,10 +23,13 @@ export const useEmployees = () => {
   const dispatch = useAppDispatch();
   const employees = useAppSelector(selectEmployees);
   const loading = useAppSelector(selectEmployeeLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadEmployees());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadEmployees());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     employees,

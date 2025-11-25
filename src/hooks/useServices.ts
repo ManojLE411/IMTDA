@@ -12,6 +12,7 @@ import {
   saveService,
   deleteService,
 } from '@/store/slices/serviceSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { Service } from '@/types/service.types';
 
 /**
@@ -22,10 +23,13 @@ export const useServices = () => {
   const dispatch = useAppDispatch();
   const services = useAppSelector(selectServices);
   const loading = useAppSelector(selectServiceLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadServices());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadServices());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     services,

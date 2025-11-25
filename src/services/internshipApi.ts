@@ -13,20 +13,48 @@ class InternshipApiService {
    * Get all internship tracks
    */
   async getAllTracks(): Promise<InternshipTrack[]> {
-    const response = await apiClient.get<ApiResponse<InternshipTrack[]>>(
-      API_ENDPOINTS.INTERNSHIP.LIST
-    );
-    return response.data;
+    try {
+      const response = await apiClient.get<ApiResponse<InternshipTrack[]>>(
+        API_ENDPOINTS.INTERNSHIP.LIST
+      );
+      // Ensure response.data is an array
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      console.warn('Internship API response format unexpected:', response);
+      return [];
+    } catch (error) {
+      console.error('Error fetching internship tracks:', error);
+      throw error;
+    }
   }
 
   /**
    * Get paginated internship tracks
    */
   async getPaginatedTracks(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<InternshipTrack>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<InternshipTrack>>>(
+    const response = await apiClient.get<ApiResponse<InternshipTrack[]> & { pagination?: any }>(
       `${API_ENDPOINTS.INTERNSHIP.LIST}?page=${page}&pageSize=${pageSize}`
     );
-    return response.data;
+    // Backend returns { data: T[], pagination: {...} }
+    // Frontend expects { data: T[], total, page, pageSize, totalPages }
+    if (response.pagination) {
+      return {
+        data: response.data,
+        total: response.pagination.total,
+        page: response.pagination.page,
+        pageSize: response.pagination.pageSize,
+        totalPages: response.pagination.totalPages,
+      };
+    }
+    // Fallback if no pagination info
+    return {
+      data: response.data,
+      total: response.data.length,
+      page,
+      pageSize,
+      totalPages: 1,
+    };
   }
 
   /**
@@ -81,10 +109,34 @@ class InternshipApiService {
   /**
    * Submit internship application
    */
-  async submitApplication(data: Omit<InternshipApplication, 'id' | 'date' | 'status'>): Promise<InternshipApplication> {
+  async submitApplication(
+    data: Omit<InternshipApplication, 'id' | 'date' | 'status' | 'resumeName' | 'resumePath'>,
+    resumeFile?: File
+  ): Promise<InternshipApplication> {
+    const formData = new FormData();
+    
+    // Append all form fields
+    if (data.internshipId) {
+      formData.append('internshipId', data.internshipId);
+    }
+    formData.append('name', data.name || '');
+    formData.append('email', data.email || '');
+    formData.append('phone', data.phone || '');
+    formData.append('course', data.course || '');
+    formData.append('message', data.message || '');
+    if (data.studentId) {
+      formData.append('studentId', data.studentId);
+    }
+    
+    // Append resume file if provided
+    if (resumeFile) {
+      formData.append('resume', resumeFile);
+    }
+    
+    // Don't set Content-Type header - browser will set it automatically with boundary for FormData
     const response = await apiClient.post<ApiResponse<InternshipApplication>>(
       `${API_ENDPOINTS.INTERNSHIP.BASE}/applications`,
-      data
+      formData
     );
     return response.data;
   }

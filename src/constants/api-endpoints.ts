@@ -12,6 +12,9 @@ export const API_ENDPOINTS = {
     REFRESH: '/api/auth/refresh',
     ME: '/api/auth/me',
     UPDATE_PROFILE: '/api/auth/profile',
+    // Admin auth endpoints
+    ADMIN_LOGIN: '/api/auth/admin/login',
+    ADMIN_REGISTER: '/api/auth/admin/register',
   },
 
   // Blog endpoints
@@ -70,6 +73,49 @@ export const API_ENDPOINTS = {
     DETAIL: (id: string) => `/api/users/${id}`,
     UPDATE: (id: string) => `/api/users/${id}`,
     DELETE: (id: string) => `/api/users/${id}`,
+  },
+
+  // Service endpoints
+  SERVICE: {
+    BASE: '/api/services',
+    LIST: '/api/services',
+    DETAIL: (id: string) => `/api/services/${id}`,
+    CREATE: '/api/services',
+    UPDATE: (id: string) => `/api/services/${id}`,
+    DELETE: (id: string) => `/api/services/${id}`,
+  },
+
+  // Job endpoints
+  JOB: {
+    BASE: '/api/jobs',
+    LIST: '/api/jobs',
+    DETAIL: (id: string) => `/api/jobs/${id}`,
+    CREATE: '/api/jobs',
+    UPDATE: (id: string) => `/api/jobs/${id}`,
+    DELETE: (id: string) => `/api/jobs/${id}`,
+    APPLICATIONS: '/api/jobs/applications',
+    APPLICATION_DETAIL: (id: string) => `/api/jobs/applications/${id}`,
+    UPDATE_APPLICATION_STATUS: (id: string) => `/api/jobs/applications/${id}/status`,
+  },
+
+  // Testimonial endpoints
+  TESTIMONIAL: {
+    BASE: '/api/testimonials',
+    LIST: '/api/testimonials',
+    DETAIL: (id: string) => `/api/testimonials/${id}`,
+    CREATE: '/api/testimonials',
+    UPDATE: (id: string) => `/api/testimonials/${id}`,
+    DELETE: (id: string) => `/api/testimonials/${id}`,
+  },
+
+  // Project endpoints
+  PROJECT: {
+    BASE: '/api/projects',
+    LIST: '/api/projects',
+    DETAIL: (id: string) => `/api/projects/${id}`,
+    CREATE: '/api/projects',
+    UPDATE: (id: string) => `/api/projects/${id}`,
+    DELETE: (id: string) => `/api/projects/${id}`,
   },
 } as const;
 

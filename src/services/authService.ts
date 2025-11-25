@@ -1,7 +1,7 @@
 /**
  * Auth Service
  * Handles all authentication-related API calls
- * For testing: Uses hardcoded credentials
+ * Uses the real API via authApi
  */
 
 import { 
@@ -9,214 +9,91 @@ import {
   RegisterData, 
   AuthResponse, 
   User,
-  UserRole,
   AuthToken
 } from '@/types/auth.types';
-
-// Hardcoded test users
-const HARDCODED_USERS = {
-  admin: {
-    id: 'admin-001',
-    name: 'Admin User',
-    email: 'admin@imtda.com',
-    phone: '+91 98765 43210',
-    role: UserRole.ADMIN,
-    password: 'admin123',
-  },
-  student: {
-    id: 'student-001',
-    name: 'Test Student',
-    email: 'student@imtda.com',
-    phone: '+91 98765 43211',
-    role: UserRole.STUDENT,
-    password: 'student123',
-    enrolledPrograms: [],
-  },
-} as const;
-
-/**
- * Generate a mock token
- */
-const generateMockToken = (userId: string): AuthToken => {
-  const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-  return {
-    accessToken: `mock-token-${userId}-${Date.now()}`,
-    expiresAt,
-  };
-};
-
-/**
- * Simulate API delay
- */
-const delay = (ms: number = 500): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
+import { authApi } from './authApi';
+import { apiClient } from './apiClient';
 
 class AuthService {
   /**
-   * Login user - checks against hardcoded credentials
+   * Login user (student)
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    await delay(500); // Simulate API delay
-    
-    // Check admin credentials
-    if (
-      credentials.email === HARDCODED_USERS.admin.email &&
-      credentials.password === HARDCODED_USERS.admin.password
-    ) {
-      const user: User = {
-        id: HARDCODED_USERS.admin.id,
-        name: HARDCODED_USERS.admin.name,
-        email: HARDCODED_USERS.admin.email,
-        phone: HARDCODED_USERS.admin.phone,
-        role: HARDCODED_USERS.admin.role,
-        createdAt: new Date().toISOString(),
-      };
-      
-      return {
-        user,
-        token: generateMockToken(user.id),
-      };
-    }
-    
-    // Check student credentials
-    if (
-      credentials.email === HARDCODED_USERS.student.email &&
-      credentials.password === HARDCODED_USERS.student.password
-    ) {
-      const user: User = {
-        id: HARDCODED_USERS.student.id,
-        name: HARDCODED_USERS.student.name,
-        email: HARDCODED_USERS.student.email,
-        phone: HARDCODED_USERS.student.phone,
-        role: HARDCODED_USERS.student.role,
-        enrolledPrograms: [...HARDCODED_USERS.student.enrolledPrograms],
-        createdAt: new Date().toISOString(),
-      };
-      
-      return {
-        user,
-        token: generateMockToken(user.id),
-      };
-    }
-    
-    // Invalid credentials
-    throw new Error('Invalid email or password');
+    return authApi.login(credentials);
   }
 
   /**
-   * Register new user - for testing, just return a student user
+   * Admin login
+   */
+  async adminLogin(credentials: LoginCredentials): Promise<AuthResponse> {
+    return authApi.adminLogin(credentials);
+  }
+
+  /**
+   * Register new user (student)
    */
   async register(data: RegisterData): Promise<AuthResponse> {
-    await delay(500); // Simulate API delay
-    
-    // Create a new student user
-    const user: User = {
-      id: `student-${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      role: UserRole.STUDENT,
-      enrolledPrograms: [],
-      createdAt: new Date().toISOString(),
-    };
-    
-    return {
-      user,
-      token: generateMockToken(user.id),
-    };
+    return authApi.register(data);
   }
 
   /**
-   * Get current user - returns user from token if valid
+   * Admin register
    */
-  async getCurrentUser(token: string): Promise<User | null> {
-    await delay(300); // Simulate API delay
-    
-    // Extract user ID from token (mock implementation)
-    // In a real scenario, you'd decode the JWT token
-    if (token.includes('admin-001')) {
-      return {
-        id: HARDCODED_USERS.admin.id,
-        name: HARDCODED_USERS.admin.name,
-        email: HARDCODED_USERS.admin.email,
-        phone: HARDCODED_USERS.admin.phone,
-        role: HARDCODED_USERS.admin.role,
-        createdAt: new Date().toISOString(),
-      };
+  async adminRegister(data: RegisterData): Promise<AuthResponse> {
+    return authApi.adminRegister(data);
+  }
+
+  /**
+   * Get current user
+   */
+  async getCurrentUser(token?: string): Promise<User | null> {
+    try {
+      // If token provided, set it temporarily
+      if (token) {
+        apiClient.setToken(token, Date.now() + 24 * 60 * 60 * 1000);
+      }
+      
+      const user = await authApi.getCurrentUser();
+      return user;
+    } catch (error) {
+      console.warn('Failed to get current user:', error);
+      return null;
     }
-    
-    if (token.includes('student-001')) {
-      return {
-        id: HARDCODED_USERS.student.id,
-        name: HARDCODED_USERS.student.name,
-        email: HARDCODED_USERS.student.email,
-        phone: HARDCODED_USERS.student.phone,
-        role: HARDCODED_USERS.student.role,
-        enrolledPrograms: [...HARDCODED_USERS.student.enrolledPrograms],
-        createdAt: new Date().toISOString(),
-      };
-    }
-    
-    return null;
   }
 
   /**
    * Validate token
+   * For JWT tokens, we check expiration via the API
    */
   validateToken(token: string): boolean {
-    // Basic validation: check if token exists and is not empty
-    // Also check if it's not expired (for mock tokens)
     if (!token || token.length === 0) {
       return false;
     }
     
-    // For mock tokens, just check if they exist
-    // In production, you'd decode and verify the JWT
-    return token.startsWith('mock-token-');
+    // For JWT tokens, we can't validate without the secret
+    // So we just check if it exists and has a reasonable format
+    // Actual validation happens on the server
+    return token.length > 20; // JWT tokens are typically longer
   }
 
   /**
-   * Update user
+   * Update user profile
    */
   async updateUser(userId: string, updates: Partial<User>): Promise<User> {
-    await delay(500);
-    
-    // Mock implementation - just return updated user
-    // In real app, this would call the API
-    throw new Error('Update user not implemented in mock mode');
+    return authApi.updateProfile(updates);
   }
 
   /**
-   * Get user by ID
+   * Get user by ID (not used in auth flow, but kept for compatibility)
    */
   async getUserById(userId: string): Promise<User | null> {
-    await delay(300);
-    
-    if (userId === HARDCODED_USERS.admin.id) {
-      return {
-        id: HARDCODED_USERS.admin.id,
-        name: HARDCODED_USERS.admin.name,
-        email: HARDCODED_USERS.admin.email,
-        phone: HARDCODED_USERS.admin.phone,
-        role: HARDCODED_USERS.admin.role,
-        createdAt: new Date().toISOString(),
-      };
+    try {
+      // This would require a separate API endpoint
+      // For now, return null or use getCurrentUser
+      return null;
+    } catch (error) {
+      return null;
     }
-    
-    if (userId === HARDCODED_USERS.student.id) {
-      return {
-        id: HARDCODED_USERS.student.id,
-        name: HARDCODED_USERS.student.name,
-        email: HARDCODED_USERS.student.email,
-        phone: HARDCODED_USERS.student.phone,
-        role: HARDCODED_USERS.student.role,
-        enrolledPrograms: [...HARDCODED_USERS.student.enrolledPrograms],
-        createdAt: new Date().toISOString(),
-      };
-    }
-    
-    return null;
   }
 }
 

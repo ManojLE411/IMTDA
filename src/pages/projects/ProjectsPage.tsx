@@ -1,85 +1,55 @@
 import React, { useState } from 'react';
-import { ExternalLink, Github, FolderOpen, ArrowLeft } from 'lucide-react';
+import { ExternalLink, Github, FolderOpen, ArrowLeft, Code, Rocket, Send, Calendar } from 'lucide-react';
 import { Project } from '@/types/common.types';
-import { Tabs, EmptyState, SectionHeader, Badge } from '@/components/ui';
+import { Tabs, EmptyState, SectionHeader, Badge, Loading } from '@/components/ui';
+import { Page } from '@/constants';
+import { useNavigate } from 'react-router-dom';
+import { useProjects } from '@/hooks/useProjects';
 import styles from './ProjectsPage.module.css';
 
-const projectsData: Project[] = [
-  {
-    id: '1',
-    title: 'Smart Traffic Management',
-    category: 'AI/ML',
-    description: 'A computer vision system to analyze traffic flow and optimize signal timings in real-time.',
-    techStack: ['Python', 'OpenCV', 'YOLOv8'],
-    image: 'https://picsum.photos/500/300?random=10'
-  },
-  {
-    id: '2',
-    title: 'Enterprise E-Learning Platform',
-    category: 'Web',
-    description: 'A scalable SaaS platform with video streaming, real-time analytics, and automated assessments for educational institutions.',
-    techStack: ['React', 'Node.js', 'AWS S3', 'PostgreSQL', 'Redis'],
-    image: 'https://picsum.photos/500/300?random=11'
-  },
-  {
-    id: '3',
-    title: 'Low Power ALU Design',
-    category: 'VLSI',
-    description: 'Designed a 16-bit ALU with optimized power consumption using Verilog.',
-    techStack: ['Verilog', 'Xilinx Vivado'],
-    image: 'https://picsum.photos/500/300?random=12'
-  },
-  {
-    id: '4',
-    title: 'Crop Disease Detection',
-    category: 'AI/ML',
-    description: 'Mobile-ready model to detect plant diseases from leaf images for farmers.',
-    techStack: ['TensorFlow Lite', 'Android'],
-    image: 'https://picsum.photos/500/300?random=13'
-  },
-  {
-    id: '5',
-    title: 'Smart Surveillance System',
-    category: 'IoT',
-    description: 'IoT based intrusion detection system with automated alerts.',
-    techStack: ['Raspberry Pi', 'Python', 'Sensors'],
-    image: 'https://picsum.photos/500/300?random=14'
-  },
-  {
-    id: '6',
-    title: 'Cloud-Based Analytics Dashboard',
-    category: 'Data Science',
-    description: 'Real-time business intelligence platform with interactive dashboards and automated reporting for enterprise clients.',
-    techStack: ['Python', 'React', 'PostgreSQL', 'AWS', 'Docker'],
-    image: 'https://picsum.photos/500/300?random=15'
-  },
-  {
-    id: '7',
-    title: 'Microservices E-Commerce Platform',
-    category: 'Web',
-    description: 'High-performance e-commerce solution built with microservices architecture, supporting millions of transactions.',
-    techStack: ['Node.js', 'React', 'MongoDB', 'Kubernetes', 'Redis'],
-    image: 'https://picsum.photos/500/300?random=16'
-  },
-  {
-    id: '8',
-    title: 'Automated Workflow Management System',
-    category: 'Web',
-    description: 'Enterprise workflow automation platform that streamlines business processes and reduces operational overhead.',
-    techStack: ['Django', 'React', 'Celery', 'PostgreSQL', 'RabbitMQ'],
-    image: 'https://picsum.photos/500/300?random=17'
-  }
-];
-
 export const ProjectsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { projects, loading } = useProjects();
   const [filter, setFilter] = useState<string>('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   
   const categories = ['All', 'AI/ML', 'Web', 'Data Science', 'IoT', 'VLSI'];
+  
+  const projectsData = projects || [];
+
+  // Helper function to get category icon
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'AI/ML':
+        return <Code size={24} />;
+      case 'Web':
+        return <Rocket size={24} />;
+      case 'VLSI':
+        return <Code size={24} />;
+      case 'IoT':
+        return <Rocket size={24} />;
+      case 'Data Science':
+        return <Code size={24} />;
+      default:
+        return <FolderOpen size={24} />;
+    }
+  };
+
+  // Helper function to handle navigation
+  const handleNavigate = (page: Page) => {
+    const route = `/${page}`;
+    if (navigate) {
+      navigate(route);
+    }
+  };
 
   const filteredProjects = filter === 'All' 
     ? projectsData 
     : projectsData.filter(p => p.category === filter);
+
+  if (loading) {
+    return <Loading text="Loading projects..." fullScreen />;
+  }
 
   // Scroll to top when viewing project
   const handleViewProject = (project: Project) => {
@@ -105,15 +75,28 @@ export const ProjectsPage: React.FC = () => {
           </button>
 
           <div className={styles.projectHeader}>
-            <Badge variant="primary" className={styles.projectCategory}>
+            <span className={styles.projectCategoryBadge}>
               {selectedProject.category}
-            </Badge>
-            <h1 className={styles.projectDetailTitle}>
-              {selectedProject.title}
-            </h1>
+            </span>
+            <div className={styles.projectTitleSection}>
+              <div className={styles.projectIconContainer}>
+                {getCategoryIcon(selectedProject.category)}
+              </div>
+              <h1 className={styles.projectDetailTitle}>
+                {selectedProject.title}
+              </h1>
+            </div>
             <p className={styles.projectDetailDescription}>
               {selectedProject.description}
             </p>
+            <div className={styles.projectMeta}>
+              <span className={styles.projectMetaItem}>
+                <Code size={16} /> {selectedProject.techStack.length} Technologies
+              </span>
+              <span className={styles.projectMetaItem}>
+                <FolderOpen size={16} /> {selectedProject.category} Project
+              </span>
+            </div>
           </div>
 
           <div className={styles.projectImage}>
@@ -123,14 +106,49 @@ export const ProjectsPage: React.FC = () => {
             />
           </div>
 
-          <div className={styles.projectDetailContentSection}>
-            <h2 className={styles.projectTechStackTitle}>Technology Stack</h2>
-            <div className={styles.projectTechStackDetail}>
-              {selectedProject.techStack.map(tech => (
-                <Badge key={tech} variant="default" size="sm" className={styles.techTag}>
-                  {tech}
-                </Badge>
+          <div className={styles.projectContent}>
+            <h2 className={styles.projectTechStackTitle}>Technology Stack & Tools</h2>
+            <p className={styles.projectTechStackIntro}>
+              This project leverages the following technologies and tools to deliver innovative solutions:
+            </p>
+            <div className={styles.projectTechStackGrid}>
+              {selectedProject.techStack.map((tech, idx) => (
+                <div key={idx} className={styles.techStackCard}>
+                  <div className={styles.techStackIcon}>
+                    <Code size={18} />
+                  </div>
+                  <span className={styles.techStackName}>{tech}</span>
+                </div>
               ))}
+            </div>
+          </div>
+
+          <div className={styles.projectCta}>
+            <h3 className={styles.projectCtaTitle}>Interested in This Project?</h3>
+            <p className={styles.projectCtaDescription}>
+              Let's discuss how we can help bring your vision to life with similar innovative solutions.
+            </p>
+            <div className={styles.projectCtaButtons}>
+              <button
+                onClick={() => handleNavigate(Page.CONTACT)}
+                className={styles.projectCtaPrimary}
+              >
+                <Send size={16} /> Get in Touch
+              </button>
+              <button
+                onClick={handleBackToList}
+                className={styles.projectCtaSecondary}
+              >
+                View All Projects
+              </button>
+            </div>
+            <div className={styles.projectLinks}>
+              <a href="#" className={styles.projectLink} title="View on GitHub">
+                <Github size={18} /> GitHub
+              </a>
+              <a href="#" className={styles.projectLink} title="View Live Demo">
+                <ExternalLink size={18} /> Live Demo
+              </a>
             </div>
           </div>
         </div>

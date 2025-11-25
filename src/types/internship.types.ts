@@ -17,11 +17,13 @@ export interface InternshipTrack {
 
 export interface InternshipApplication {
   id: string;
+  internshipId?: string; // ID of the internship track
   name: string;
   email: string;
   phone: string;
   course: string;
-  resumeName: string; // Storing filename to simulate upload
+  resumeName?: string; // Storing filename to simulate upload
+  resumePath?: string; // Path to uploaded resume file
   message: string;
   date: string;
   status: 'Pending' | 'Approved' | 'Rejected';

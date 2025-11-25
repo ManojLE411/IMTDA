@@ -5,7 +5,8 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { BlogPost } from '@/types/blog.types';
-import { blogStorage } from '@/api/blogStorage';
+import { blogApi } from '@/services/blogApi';
+import { isValidObjectId } from '@/utils/validation';
 
 interface BlogState {
   posts: BlogPost[];
@@ -20,10 +21,10 @@ const initialState: BlogState = {
 };
 
 /**
- * Load blog posts from storage
+ * Load blog posts from API
  */
 export const loadBlogPosts = createAsyncThunk('blog/load', async () => {
-  return blogStorage.getAll();
+  return blogApi.getAll();
 });
 
 /**
@@ -32,9 +33,10 @@ export const loadBlogPosts = createAsyncThunk('blog/load', async () => {
 export const saveBlogPost = createAsyncThunk(
   'blog/save',
   async (post: BlogPost, { dispatch }) => {
-    blogStorage.save(post);
+    const { id, ...postData } = post;
+    const savedPost = id && isValidObjectId(id) ? await blogApi.update(id, postData) : await blogApi.create(postData);
     dispatch(loadBlogPosts());
-    return post;
+    return savedPost;
   }
 );
 
@@ -44,7 +46,7 @@ export const saveBlogPost = createAsyncThunk(
 export const deleteBlogPost = createAsyncThunk(
   'blog/delete',
   async (id: string, { dispatch }) => {
-    blogStorage.delete(id);
+    await blogApi.delete(id);
     dispatch(loadBlogPosts());
     return id;
   }
@@ -66,15 +68,26 @@ const blogSlice = createSlice({
       })
       .addCase(loadBlogPosts.fulfilled, (state, action) => {
         state.loading = false;
-        state.posts = action.payload;
+        // Ensure payload is an array
+        state.posts = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(loadBlogPosts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to load blog posts';
-        state.posts = [];
+        console.error('Failed to load blog posts:', action.error);
+        // Keep existing posts on error instead of clearing
+        if (state.posts.length === 0) {
+          state.posts = [];
+        }
+      })
+      .addCase(saveBlogPost.fulfilled, (state, action) => {
+        // Post is already updated via loadBlogPosts
       })
       .addCase(saveBlogPost.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to save blog post';
+      })
+      .addCase(deleteBlogPost.fulfilled, (state) => {
+        // Posts are already updated via loadBlogPosts
       })
       .addCase(deleteBlogPost.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to delete blog post';
@@ -85,7 +98,7 @@ const blogSlice = createSlice({
 export const { clearError } = blogSlice.actions;
 
 // Selectors
-export const selectBlogPosts = (state: { blog: BlogState }) => state.blog.posts;
+export const selectBlogPosts = (state: { blog: BlogState }) => state.blog?.posts || [];
 export const selectBlogLoading = (state: { blog: BlogState }) => state.blog.loading;
 export const selectBlogError = (state: { blog: BlogState }) => state.blog.error;
 

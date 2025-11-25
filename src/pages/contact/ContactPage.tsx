@@ -3,6 +3,7 @@ import { MapPin, Mail, Phone, Send, MessageCircle } from 'lucide-react';
 import { useContactMessages } from '@/hooks/useContactMessages';
 import { useLocation } from 'react-router-dom';
 import { Alert } from '@/components/ui';
+import { EXTERNAL_APIS } from '@/config';
 import styles from './ContactPage.module.css';
 
 interface LocationState {
@@ -20,6 +21,7 @@ export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    mobile: '',
     subject: locationState?.subject || 'General Inquiry',
     message: locationState?.message || ''
   });
@@ -68,6 +70,10 @@ export const ContactPage: React.FC = () => {
       setError('Please enter a valid email address.');
       return;
     }
+    if (!formData.mobile.trim()) {
+      setError('Please enter your mobile number.');
+      return;
+    }
     if (!formData.message.trim()) {
       setError('Please enter your message.');
       return;
@@ -78,6 +84,7 @@ export const ContactPage: React.FC = () => {
       id: Date.now().toString(),
       name: formData.name.trim(),
       email: formData.email.trim(),
+      mobile: formData.mobile.trim(),
       subject: formData.subject,
       message: formData.message.trim(),
       date: new Date().toLocaleDateString('en-US', { 
@@ -99,6 +106,7 @@ export const ContactPage: React.FC = () => {
       setFormData({
         name: '',
         email: '',
+        mobile: '',
         subject: 'General Inquiry',
         message: ''
       });
@@ -199,6 +207,19 @@ export const ContactPage: React.FC = () => {
                   </div>
                 </div>
                 <div className={styles.formGroup}>
+                  <label htmlFor="mobile" className={styles.label}>Mobile Number *</label>
+                  <input 
+                    type="tel" 
+                    id="mobile"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleInputChange}
+                    className={styles.input}
+                    placeholder="Your Mobile Number" 
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
                   <label htmlFor="subject" className={styles.label}>Subject *</label>
                   <select 
                     id="subject"
@@ -244,7 +265,7 @@ export const ContactPage: React.FC = () => {
         {/* Map Integration Placeholder */}
         <div className={styles.mapSection}>
            <iframe 
-             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60797.56216724848!2d83.4312!3d17.8914!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a3957a000000001%3A0x0!2sBheemunipatnam%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1640000000000!5m2!1sen!2sin" 
+             src={EXTERNAL_APIS.GOOGLE_MAPS_EMBED_URL} 
              width="100%" 
              height="100%" 
              style={{border:0}} 

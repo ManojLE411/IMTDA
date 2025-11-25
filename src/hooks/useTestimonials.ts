@@ -12,6 +12,7 @@ import {
   saveTestimonial,
   deleteTestimonial,
 } from '@/store/slices/testimonialSlice';
+import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { Testimonial } from '@/types/testimonial.types';
 
 /**
@@ -22,10 +23,13 @@ export const useTestimonials = () => {
   const dispatch = useAppDispatch();
   const testimonials = useAppSelector(selectTestimonials);
   const loading = useAppSelector(selectTestimonialLoading);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    dispatch(loadTestimonials());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(loadTestimonials());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return {
     testimonials,

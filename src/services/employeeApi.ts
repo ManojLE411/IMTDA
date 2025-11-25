@@ -13,10 +13,20 @@ class EmployeeApiService {
    * Get all employees
    */
   async getAll(): Promise<Employee[]> {
-    const response = await apiClient.get<ApiResponse<Employee[]>>(
-      API_ENDPOINTS.EMPLOYEE.LIST
-    );
-    return response.data;
+    try {
+      const response = await apiClient.get<ApiResponse<Employee[]>>(
+        API_ENDPOINTS.EMPLOYEE.LIST
+      );
+      // Ensure response.data is an array
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      console.warn('Employee API response format unexpected:', response);
+      return [];
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      throw error;
+    }
   }
 
   /**

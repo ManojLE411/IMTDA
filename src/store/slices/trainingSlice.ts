@@ -5,7 +5,8 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { TrainingProgram } from '@/types/training.types';
-import { trainingStorage } from '@/api/trainingStorage';
+import { trainingApi } from '@/services/trainingApi';
+import { isValidObjectId } from '@/utils/validation';
 
 interface TrainingState {
   programs: TrainingProgram[];
@@ -20,10 +21,10 @@ const initialState: TrainingState = {
 };
 
 /**
- * Load training programs from storage
+ * Load training programs from API
  */
 export const loadTrainingPrograms = createAsyncThunk('training/load', async () => {
-  return trainingStorage.getAll();
+  return trainingApi.getAll();
 });
 
 /**
@@ -32,9 +33,10 @@ export const loadTrainingPrograms = createAsyncThunk('training/load', async () =
 export const saveTrainingProgram = createAsyncThunk(
   'training/save',
   async (program: TrainingProgram, { dispatch }) => {
-    trainingStorage.save(program);
+    const { id, ...programData } = program;
+    const savedProgram = id && isValidObjectId(id) ? await trainingApi.update(id, programData) : await trainingApi.create(programData);
     dispatch(loadTrainingPrograms());
-    return program;
+    return savedProgram;
   }
 );
 
@@ -44,7 +46,7 @@ export const saveTrainingProgram = createAsyncThunk(
 export const deleteTrainingProgram = createAsyncThunk(
   'training/delete',
   async (id: string, { dispatch }) => {
-    trainingStorage.delete(id);
+    await trainingApi.delete(id);
     dispatch(loadTrainingPrograms());
     return id;
   }
@@ -66,15 +68,26 @@ const trainingSlice = createSlice({
       })
       .addCase(loadTrainingPrograms.fulfilled, (state, action) => {
         state.loading = false;
-        state.programs = action.payload;
+        // Ensure payload is an array and has id fields
+        state.programs = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(loadTrainingPrograms.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to load training programs';
-        state.programs = [];
+        console.error('Failed to load training programs:', action.error);
+        // Keep existing programs on error instead of clearing
+        if (state.programs.length === 0) {
+          state.programs = [];
+        }
+      })
+      .addCase(saveTrainingProgram.fulfilled, (state) => {
+        // Programs are already updated via loadTrainingPrograms
       })
       .addCase(saveTrainingProgram.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to save training program';
+      })
+      .addCase(deleteTrainingProgram.fulfilled, (state) => {
+        // Programs are already updated via loadTrainingPrograms
       })
       .addCase(deleteTrainingProgram.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to delete training program';
@@ -86,7 +99,7 @@ export const { clearError } = trainingSlice.actions;
 
 // Selectors
 export const selectTrainingPrograms = (state: { training: TrainingState }) =>
-  state.training.programs;
+  state.training?.programs || [];
 export const selectTrainingLoading = (state: { training: TrainingState }) =>
   state.training.loading;
 export const selectTrainingError = (state: { training: TrainingState }) =>
