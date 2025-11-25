@@ -70,6 +70,18 @@ class ApiClient {
           return Promise.reject(error);
         }
 
+        // Handle 403 Forbidden - Log and provide helpful message
+        if (error.response?.status === 403) {
+          const backendError = error.response.data as any;
+          const errorMessage = backendError?.error?.message || backendError?.message || error.message;
+          console.error('403 Forbidden:', {
+            url: originalRequest.url,
+            message: errorMessage,
+            hint: 'This may be a CORS issue or insufficient permissions. Check backend CORS configuration and user role.',
+          });
+          return Promise.reject(error);
+        }
+
         // Handle 429 Too Many Requests - Log but don't redirect
         if (error.response?.status === 429) {
           console.warn('Rate limit exceeded. Please wait a moment before making more requests.');
