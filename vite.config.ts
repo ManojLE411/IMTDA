@@ -18,6 +18,15 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      preview: {
+        port: Number(process.env.PORT) || 3000,
+        host: '0.0.0.0',
+        allowedHosts: [
+          'imtda-h739.onrender.com',
+          '.onrender.com',
+          'localhost',
+        ],
+      },
     };
 });
