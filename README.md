@@ -33,6 +33,22 @@ npm run preview
 - `VITE_GEMINI_API_KEY` - Gemini API key (optional)
 - `VITE_VERBOSE` - Enable verbose logging (optional)
 
+## Deployment
+
+### Render.com
+
+This project includes a `render.yaml` configuration file for deploying to Render as a static site.
+
+**Important:** 
+- Deploy as a **Static Site** service (not Web Service)
+- The `render.yaml` file handles SPA routing automatically
+- Ensure your frontend is deployed separately from the backend API
+- The frontend should have its own URL (e.g., `imtda-frontend.onrender.com`)
+
+**If frontend and backend are on the same domain:**
+- The backend must serve `index.html` for all non-API routes
+- This requires backend configuration changes
+
 ## Project Structure
 
 ```
