@@ -1,7 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,19 +29,46 @@ if (!existsSync(indexPath)) {
 console.log(`Serving static files from: ${distPath}`);
 console.log(`Index file located at: ${indexPath}`);
 
-// Serve static files from the dist directory
+// Log available files in dist/assets for debugging
+try {
+  const assetsPath = join(distPath, 'assets');
+  if (existsSync(assetsPath)) {
+    const assets = readdirSync(assetsPath);
+    console.log(`Found ${assets.length} asset files in dist/assets`);
+  }
+} catch (err) {
+  // Ignore if assets folder doesn't exist yet
+  console.log('Assets folder not found or error reading assets');
+}
+
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
+// Serve static files from the dist directory (assets, images, etc.)
 app.use(express.static(distPath, {
   // Don't serve index.html for static file requests
   index: false,
+  // Set proper cache headers for assets
+  maxAge: '1y',
 }));
 
 // Handle all routes by serving index.html (SPA fallback)
 // This catches all routes that don't match static files
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
   // Skip API routes - these should go to the backend (though in production
   // they typically use full URLs, this is a safety measure)
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  
+  // Skip asset requests - these should be handled by static middleware
+  // If we reach here for an asset, it means the file doesn't exist
+  if (req.path.startsWith('/assets/') || 
+      req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
+    return res.status(404).send('File not found');
   }
   
   // Serve index.html for all other routes (SPA routing)
