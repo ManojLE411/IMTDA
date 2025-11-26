@@ -12,7 +12,6 @@ import {
   saveJob,
   deleteJob,
 } from '@/store/slices/jobSlice';
-import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { Job } from '@/types/job.types';
 
 /**
@@ -23,13 +22,11 @@ export const useJobs = () => {
   const dispatch = useAppDispatch();
   const jobs = useAppSelector(selectJobs);
   const loading = useAppSelector(selectJobLoading);
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(loadJobs());
-    }
-  }, [dispatch, isAuthenticated]);
+    // Load jobs for all users (public page)
+    dispatch(loadJobs());
+  }, [dispatch]);
 
   return {
     jobs,

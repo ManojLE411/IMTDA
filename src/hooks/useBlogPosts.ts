@@ -12,7 +12,6 @@ import {
   saveBlogPost,
   deleteBlogPost,
 } from '@/store/slices/blogSlice';
-import { selectIsAuthenticated } from '@/store/slices/authSlice';
 import { BlogPost } from '@/types/blog.types';
 
 /**
@@ -23,13 +22,11 @@ export const useBlogPosts = () => {
   const dispatch = useAppDispatch();
   const posts = useAppSelector(selectBlogPosts);
   const loading = useAppSelector(selectBlogLoading);
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(loadBlogPosts());
-    }
-  }, [dispatch, isAuthenticated]);
+    // Load blog posts for all users (public page)
+    dispatch(loadBlogPosts());
+  }, [dispatch]);
 
   return {
     posts,

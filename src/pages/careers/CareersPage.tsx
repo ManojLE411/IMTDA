@@ -4,11 +4,11 @@ import { useJobs } from '@/hooks/useJobs';
 import { useJobApplication } from '@/hooks/useJobApplication';
 import { useAuth } from '@/hooks/useAuth';
 import { Job } from '@/types/job.types';
-import { Alert } from '@/components/ui';
+import { Alert, Loading } from '@/components/ui';
 import styles from './CareersPage.module.css';
 
 export const CareersPage: React.FC = () => {
-  const { jobs } = useJobs();
+  const { jobs, loading } = useJobs();
   const { applyForJob } = useJobApplication();
   const { user: currentUser } = useAuth();
   
@@ -22,8 +22,6 @@ export const CareersPage: React.FC = () => {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const displayJobs = jobs || [];
-
   // Prefill form if user is logged in
   useEffect(() => {
     if (currentUser) {
@@ -35,6 +33,12 @@ export const CareersPage: React.FC = () => {
       }));
     }
   }, [currentUser]);
+
+  const displayJobs = jobs || [];
+
+  if (loading) {
+    return <Loading text="Loading..." fullScreen />;
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
